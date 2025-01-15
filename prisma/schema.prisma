@@ -7,62 +7,68 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
+    id          String   @id @default(cuid())
+    media       String
+    description String?
+    hashtags    String[]
+    likes       BigInt   @default(0)
+    shares      BigInt   @default(0)
+    comments    BigInt   @default(0)
+    views       BigInt   @default(0)
     createdById String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
 
-    @@index([name])
-}
+    createdBy User        @relation(fields: [createdById], references: [id])
+    PostView  View[]
+    PostLike  Like[]
+    Comment   Comment[]
+    Share     Share[]
+    PostReort PostReort[]
 
-// Necessary for Next auth
-model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
-    type                     String
-    provider                 String
-    providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
-    expires_at               Int?
-    token_type               String?
-    scope                    String?
-    id_token                 String? // @db.Text
-    session_state            String?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refresh_token_expires_in Int?
-
-    @@unique([provider, providerAccountId])
-}
-
-model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    @@index([createdById])
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+    id        String   @id @default(cuid())
+    name      String   @unique
+    email     String   @unique
+    image     String?
+    role      UserRole @default(USER)
+    bio       String?
+    followers BigInt   @default(0)
+    following BigInt   @default(0)
+    posts     BigInt   @default(0)
+    createdAt DateTime @default(now())
+    updatedAt DateTime
+
+    Post                Post[]
+    View                View[]
+    Like                Like[]
+    Comment             Comment[]
+    Follower            Follower[]      @relation("FollowerUser")
+    Following           Follower[]      @relation("FollowingUser")
+    SharedByUser        Share[]         @relation("SharedByUser")
+    SharedToUser        Share[]         @relation("SharedToUser")
+    FollowRequestByUser FollowRequest[] @relation("FollowRequestByUser")
+    FollowRequestToUser FollowRequest[] @relation("FollowRequestToUser")
+    UserReport          UserReport[]
+
+    @@index([name])
+    @@index([email])
+}
+
+model RefreshToken {
+    id        String   @id @default(cuid())
+    token     String   @unique
+    isUsed    Boolean  @default(false)
+    createdAt DateTime @default(now())
+
+    @@index([token])
 }
 
 model VerificationToken {
@@ -71,4 +77,142 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model View {
+    id         String   @id @default(cuid())
+    postId     String
+    viewedById String
+    viewedAt   DateTime @default(now())
+
+    post   Post @relation(fields: [postId], references: [id])
+    viewer User @relation(fields: [viewedById], references: [id])
+
+    @@index([postId, viewedById])
+}
+
+model Like {
+    id        String   @id @default(cuid())
+    postId    String
+    likedById String
+    likedAt   DateTime @default(now())
+
+    post    Post @relation(fields: [postId], references: [id])
+    likedBy User @relation(fields: [likedById], references: [id])
+}
+
+model Share {
+    id         String   @id @default(cuid())
+    postId     String
+    sharedById String
+    sharedToId String
+    sharedAt   DateTime @default(now())
+
+    post     Post @relation(fields: [postId], references: [id])
+    sharedBy User @relation("SharedByUser", fields: [sharedById], references: [id])
+    sharedTo User @relation("SharedToUser", fields: [sharedToId], references: [id])
+
+    @@unique([sharedById, sharedToId])
+    @@index([postId])
+}
+
+model Comment {
+    id           String  @id @default(cuid())
+    content      String
+    parentId     String?
+    postId       String
+    commetedById String
+    likes        BigInt  @default(0)
+
+    parent      Comment? @relation("CommentToParent", fields: [parentId], references: [id])
+    post        Post     @relation(fields: [postId], references: [id])
+    commentedBy User     @relation(fields: [commetedById], references: [id])
+
+    replies       Comment[]       @relation("CommentToParent")
+    CommentReport CommentReport[]
+}
+
+model Follower {
+    id          String @id @default(cuid())
+    followerId  String
+    followingId String
+
+    follower  User @relation("FollowerUser", fields: [followerId], references: [id])
+    following User @relation("FollowingUser", fields: [followingId], references: [id])
+
+    @@unique([followerId, followingId])
+    @@index([followerId])
+    @@index([followingId])
+}
+
+model FollowRequest {
+    id            String   @id @default(cuid())
+    requestedById String
+    requestedToId String
+    requestedAt   DateTime @default(now())
+
+    requestedBy User @relation("FollowRequestByUser", fields: [requestedById], references: [id])
+    requestedTo User @relation("FollowRequestToUser", fields: [requestedToId], references: [id])
+
+    @@unique([requestedById, requestedToId])
+    @@index([requestedById])
+    @@index([requestedToId])
+}
+
+model UserReport {
+    id           String     @id @default(cuid())
+    reportedToId String
+    reportType   ReportType
+    description  String?
+    reportedAt   DateTime   @default(now())
+
+    reportedTo User @relation(fields: [reportedToId], references: [id])
+
+    @@index([reportedToId])
+}
+
+model PostReort {
+    id           String     @id @default(cuid())
+    reportedToId String
+    reportType   ReportType
+    description  String?
+    reportedAt   DateTime   @default(now())
+
+    reportedTo Post @relation(fields: [reportedToId], references: [id])
+
+    @@index([reportedToId])
+}
+
+model CommentReport {
+    id           String     @id @default(cuid())
+    reportedToId String
+    reportType   ReportType
+    description  String?
+    reportedAt   DateTime   @default(now())
+
+    reportedTo Comment @relation(fields: [reportedToId], references: [id])
+
+    @@index([reportedToId])
+}
+
+// enums
+enum UserRole {
+    USER
+    ADMIN
+    BANNED
+}
+
+enum ReportType {
+    HARASSMENT
+    IMPERSONATION
+    SPAM
+    OFFENSIVE_CONTENT
+    FRAUD
+    HATE_SPEECH
+    INAPPROPRIATE_PROFILE
+    MISINFORMATION
+    VIOLENCE_THREATS
+    COPYRIGHT_VIOLATION
+    GRAPHIC_CONTENT
+    OTHER
 }
