@@ -117,12 +117,14 @@ model Share {
 }
 
 model Comment {
-    id           String  @id @default(cuid())
+    id           String   @id @default(cuid())
     content      String
     parentId     String?
     postId       String
     commetedById String
-    likes        BigInt  @default(0)
+    likes        BigInt   @default(0)
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime
 
     parent      Comment? @relation("CommentToParent", fields: [parentId], references: [id])
     post        Post     @relation(fields: [postId], references: [id])
