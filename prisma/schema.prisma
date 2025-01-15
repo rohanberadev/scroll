@@ -10,29 +10,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id          String   @id @default(cuid())
-    media       String
-    description String?
-    hashtags    String[]
-    likes       BigInt   @default(0)
-    shares      BigInt   @default(0)
-    comments    BigInt   @default(0)
-    views       BigInt   @default(0)
-    createdById String
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    createdBy User        @relation(fields: [createdById], references: [id])
-    PostView  View[]
-    PostLike  Like[]
-    Comment   Comment[]
-    Share     Share[]
-    PostReort PostReort[]
-
-    @@index([createdById])
-}
-
 model User {
     id        String   @id @default(cuid())
     name      String   @unique
@@ -60,6 +37,29 @@ model User {
 
     @@index([name])
     @@index([email])
+}
+
+model Post {
+    id          String   @id @default(cuid())
+    media       String
+    description String?
+    hashtags    String[]
+    likes       BigInt   @default(0)
+    shares      BigInt   @default(0)
+    comments    BigInt   @default(0)
+    views       BigInt   @default(0)
+    postedById  String
+    postedAt    DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    createdBy User        @relation(fields: [postedById], references: [id])
+    PostView  View[]
+    PostLike  Like[]
+    Comment   Comment[]
+    Share     Share[]
+    PostReort PostReort[]
+
+    @@index([postedById])
 }
 
 model RefreshToken {
@@ -123,7 +123,7 @@ model Comment {
     postId       String
     commetedById String
     likes        BigInt   @default(0)
-    createdAt    DateTime @default(now())
+    commentedAt  DateTime @default(now())
     updatedAt    DateTime
 
     parent      Comment? @relation("CommentToParent", fields: [parentId], references: [id])
