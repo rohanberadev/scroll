@@ -1,17 +1,21 @@
+"use client";
+
 import { auth } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+import { api } from "@/trpc/react";
+import React, { useEffect, useState } from "react";
 
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
-
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
+export default function Home() {
+  const testStream = api.test.generate.useQuery();
 
   return (
-    <HydrateClient>
-      <main>Home</main>
-    </HydrateClient>
+    <main>
+      <div>
+        {testStream.data?.map((value, index) => (
+          <p key={index} className="text-white">
+            {value}
+          </p>
+        ))}
+      </div>
+    </main>
   );
 }
