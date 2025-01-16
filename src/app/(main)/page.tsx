@@ -9,13 +9,7 @@ export default function Home() {
 
   return (
     <main>
-      <div>
-        {testStream.data?.map((value, index) => (
-          <p key={index} className="text-white">
-            {value}
-          </p>
-        ))}
-      </div>
+      <div className="text-4xl text-white">Home</div>
     </main>
   );
 }
