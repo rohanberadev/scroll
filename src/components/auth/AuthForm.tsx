@@ -129,12 +129,12 @@ function SignUpForm({ formButtonLabel }: Props) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="password..." {...field} />
+                <Input placeholder="email..." {...field} />
               </FormControl>
               <FormDescription>
-                This is your password for your account.
+                This is your email for your account.
               </FormDescription>
               <FormMessage />
             </FormItem>

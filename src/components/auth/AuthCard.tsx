@@ -36,7 +36,9 @@ export default function AuthCard({
         {AuthForm}
       </CardContent>
       <CardFooter className="self-center text-sm text-stone-500 transition-all duration-300 hover:text-stone-300 hover:underline">
-        <Link href={footerLinkHref}>{footerLinkLabel}</Link>
+        <Link href={footerLinkHref} prefetch={true}>
+          {footerLinkLabel}
+        </Link>
       </CardFooter>
     </Card>
   );
