@@ -17,8 +17,10 @@ import Avatar from "@/components/user/Avatar";
 
 export default function SideNav() {
   return (
-    <nav className="border-r-[1px] border-gray-400 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
-      <h1 className="text-4xl">Scroll</h1>
+    <nav className="border-r-[1px] border-gray-600 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
+      <Link href={"#"} className="inline-flex">
+        <h1 className="text-4xl">Scroll</h1>
+      </Link>
       <ul className="mt-12 flex flex-col gap-y-10 text-lg">
         <li>
           <NavLink

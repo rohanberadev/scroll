@@ -13,7 +13,7 @@ import Avatar from "@/components/user/Avatar";
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 z-50 h-12 w-full border-t-[1px] border-gray-400 bg-black py-2 shadow-lg lg:hidden">
+    <nav className="fixed bottom-0 left-0 z-50 h-12 w-full border-t-[1px] border-gray-600 bg-black py-2 shadow-lg lg:hidden">
       <ul className="flex w-full items-center justify-around">
         <li>
           <NavLink
