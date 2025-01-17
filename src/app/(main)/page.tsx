@@ -16,7 +16,8 @@ export default function Home() {
 
       {/* <hr className="my-2 border-gray-600" /> */}
 
-      <div className="flex flex-col items-center py-4">
+      <div className="flex flex-col items-center gap-y-12 py-4">
+        <ShowPost />
         <ShowPost />
       </div>
     </div>

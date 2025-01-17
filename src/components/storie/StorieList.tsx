@@ -12,7 +12,7 @@ export default function StorieList() {
   const stories = Array.from({ length: 20 }, (_, i) => `${i}`);
 
   return (
-    <Carousel className="mb-4 w-[300px] border-b-[1px] border-gray-600 p-2 lg:w-[700px]">
+    <Carousel className="mb-4 w-[350px] border-b-[1px] border-gray-600 p-2 transition-all duration-500 lg:w-[700px]">
       <CarouselContent>
         {stories.map((_, index) => (
           <CarouselItem
@@ -27,12 +27,12 @@ export default function StorieList() {
       <CarouselPrevious
         variant={"secondary"}
         size={"sm"}
-        className="max-lg:h-6 max-lg:w-6"
+        className="max-lg:hidden"
       />
       <CarouselNext
         variant={"secondary"}
         size={"sm"}
-        className="max-lg:h-6 max-lg:w-6"
+        className="max-lg:hidden"
       />
     </Carousel>
   );
