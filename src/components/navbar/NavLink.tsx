@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AiFillHome } from "react-icons/ai";
 import { IconType } from "react-icons/lib";
 
 type Props = {
@@ -16,10 +15,12 @@ export default function NavLink({
   OutlineIcon,
 }: Props) {
   return (
-    <Link href={linkHref} className="">
+    <Link href={linkHref}>
       <div className="flex items-center gap-x-8">
         <OutlineIcon className="text-2xl leading-none" />
-        <span className="text-[1rem] leading-none">{linkLabel}</span>
+        <span className="text-[1rem] leading-none max-lg:hidden">
+          {linkLabel}
+        </span>
       </div>
     </Link>
   );

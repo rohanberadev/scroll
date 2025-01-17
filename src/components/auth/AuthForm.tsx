@@ -34,7 +34,10 @@ const signInFormSchema = z.object({
 });
 
 const signUpFormSchema = signInFormSchema.extend({
-  email: z.string().email(),
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email" }),
 });
 
 function SignInForm({ formButtonLabel }: Props) {

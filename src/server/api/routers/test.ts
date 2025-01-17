@@ -12,4 +12,10 @@ export const testRouter = createTRPCRouter({
       yield i;
     }
   }),
+
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async function ({ ctx, input }) {
+      return { title: input.id };
+    }),
 });

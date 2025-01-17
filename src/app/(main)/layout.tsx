@@ -1,15 +1,29 @@
-import Navbar from "@/components/navbar";
+import AppFooter from "@/components/AppFooter";
+import AppHeader from "@/components/AppHeader";
+import BottomNav from "@/components/navbar/BottomNav";
+import SideNav from "@/components/navbar/SideNav";
 
-export default function MainLayout({
+export default function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <main className="flex w-full flex-row">
-      <Navbar />
-      <div className="flex min-h-screen flex-1 flex-col items-center px-6 pt-2">
+    <div className="flex w-full flex-col lg:flex lg:flex-row">
+      {/* Header for Mobile */}
+      <AppHeader />
+
+      {/* Desktop Nav */}
+      <SideNav />
+
+      {/* Main Screen */}
+      <main className="no-scrollbar flex h-screen flex-col items-center overflow-y-scroll max-lg:w-full lg:flex-1">
         {children}
-      </div>
-      <footer className="border-l-[1px] border-gray-400 lg:w-[250px] xl:w-[350px]"></footer>
-    </main>
+      </main>
+
+      {/* Footer for Desktop */}
+      <AppFooter />
+
+      {/* Mobile Nav */}
+      <BottomNav />
+    </div>
   );
 }
