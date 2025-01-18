@@ -14,7 +14,7 @@ export default function AppLayout({
       <SideNav />
 
       {/* Main Screen */}
-      <main className="no-scrollbar flex h-screen flex-col items-center overflow-y-scroll max-lg:w-full lg:flex-1 lg:px-8 lg:pt-12">
+      <main className="no-scrollbar h-app-screen flex flex-col items-center overflow-y-scroll max-lg:w-full max-lg:pb-12 lg:h-screen lg:flex-1 lg:px-8 lg:pt-12">
         {children}
       </main>
 

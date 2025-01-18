@@ -7,7 +7,7 @@ import StorieList from "@/components/storie/StorieList";
 import ShowPost from "@/components/post/ShowPost";
 
 export default function Home() {
-  const posts = Array.from({ length: 10 }, (_, i) => `${i + 1}`);
+  const posts = Array.from({ length: 2 }, (_, i) => `${i + 1}`);
 
   return (
     <div className="flex w-full flex-col items-center">

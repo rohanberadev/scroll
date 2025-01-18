@@ -34,32 +34,46 @@ model User {
     FollowRequestByUser FollowRequest[] @relation("FollowRequestByUser")
     FollowRequestToUser FollowRequest[] @relation("FollowRequestToUser")
     UserReport          UserReport[]
+    SavedPost           SavedPost[]
+    Storie              Storie[]
 
     @@index([name])
     @@index([email])
 }
 
 model Post {
-    id          String   @id @default(cuid())
-    media       String
-    description String?
-    hashtags    String[]
-    likes       BigInt   @default(0)
-    shares      BigInt   @default(0)
-    comments    BigInt   @default(0)
-    views       BigInt   @default(0)
-    postedById  String
-    postedAt    DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id         String   @id @default(cuid())
+    media      String
+    caption    String?
+    hashtags   String[]
+    likes      BigInt   @default(0)
+    shares     BigInt   @default(0)
+    comments   BigInt   @default(0)
+    views      BigInt   @default(0)
+    postedById String
+    postedAt   DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 
     createdBy User        @relation(fields: [postedById], references: [id])
-    PostView  View[]
-    PostLike  Like[]
+    View      View[]
+    Like      Like[]
     Comment   Comment[]
     Share     Share[]
     PostReort PostReort[]
+    SavedPost SavedPost[]
 
     @@index([postedById])
+}
+
+model Storie {
+    id         String   @id @default(cuid())
+    postedById String
+    media      String
+    caption    String
+    postedAt   DateTime @default(now())
+    expiredAt  DateTime
+
+    postedBy User @relation(fields: [postedById], references: [id])
 }
 
 model RefreshToken {
@@ -132,6 +146,16 @@ model Comment {
 
     replies       Comment[]       @relation("CommentToParent")
     CommentReport CommentReport[]
+}
+
+model SavedPost {
+    id        String   @id @default(cuid())
+    postId    String
+    savedById String
+    savedAt   DateTime @default(now())
+
+    post    Post @relation(fields: [postId], references: [id])
+    savedBy User @relation(fields: [savedById], references: [id])
 }
 
 model Follower {
