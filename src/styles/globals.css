@@ -10,12 +10,37 @@
 
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
+  /* .no-scrollbar::-webkit-scrollbar {
     display: none;
-  }
+  } */
   /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+  /* Style the scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px; /* Adjust width of the scrollbar */
+    height: 8px; /* Adjust height of horizontal scrollbar */
+  }
+
+  /* Style the scrollbar track (background) */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Style the scrollbar thumb (the draggable part) */
+  ::-webkit-scrollbar-thumb {
+    opacity: 0.9;
+    background: #888;
+    border-radius: 10px; /* Makes the thumb rounded */ /* Optional: Add border to create space between thumb and track */
+  }
+
+  /* Optional: Style the scrollbar thumb on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  @media (min-width: 380px) and (max-width: 760px) {
+    ::-webkit-scrollbar {
+      width: 6px; /* Adjust width of the scrollbar */
+      height: 4px; /* Adjust height of horizontal scrollbar */
+    }
   }
 }

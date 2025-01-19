@@ -1,6 +1,7 @@
 import AppHeader from "@/components/AppHeader";
 import BottomNav from "@/components/navbar/BottomNav";
 import SideNav from "@/components/navbar/SideNav";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function AppLayout({
   children,
@@ -14,7 +15,7 @@ export default function AppLayout({
       <SideNav />
 
       {/* Main Screen */}
-      <main className="no-scrollbar flex h-screen flex-col items-center overflow-y-scroll max-lg:h-app-screen max-lg:w-full lg:h-screen lg:flex-1 lg:px-8 lg:pt-12">
+      <main className="scrollbar max-xs:h-mobile-screen max-lg:h-tab-screen flex h-screen flex-col items-center overflow-y-scroll max-lg:w-full lg:h-screen lg:flex-1 lg:px-8 lg:pt-12">
         {children}
       </main>
 

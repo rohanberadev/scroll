@@ -9,6 +9,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { FiSend } from "react-icons/fi";
 
@@ -24,13 +25,25 @@ export default function ShareButton({ className, shareCount }: Props) {
         <FiSend className={className} />
         <span className="text-xs">{shareCount}</span>
       </DrawerTrigger>
-      <DrawerContent className="h-[400px] w-full rounded-none border-l-[0px] border-r-[0px] border-gray-400 bg-black text-gray-400">
+      <DrawerContent className="h-[400px] w-full rounded-none border-l-[0px] border-r-[0px] border-gray-800 bg-black text-gray-400">
         <DrawerHeader>
-          <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-          <DrawerDescription>This action cannot be undone.</DrawerDescription>
+          <DrawerTitle>Sharing this post</DrawerTitle>
+          <DrawerDescription>
+            This post will be shared to the selected profiles.
+          </DrawerDescription>
         </DrawerHeader>
-        <DrawerFooter>
-          <Button>Submit</Button>
+        <ScrollArea className="w-full p-2">
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+          <div className="h-8 border-[1px]"></div>
+        </ScrollArea>
+        <DrawerFooter className="flex flex-row">
+          <Button>Share</Button>
           <DrawerClose>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>

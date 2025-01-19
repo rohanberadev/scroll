@@ -24,7 +24,7 @@ export default function CommentButton({ className, commentCount }: Props) {
         <FaRegComment className={className} />
         <span className="text-xs">{commentCount}</span>
       </DrawerTrigger>
-      <DrawerContent className="h-[500px] w-full rounded-none border-l-[0px] border-r-[0px] border-gray-400 bg-black text-gray-400 max-lg:h-full">
+      <DrawerContent className="h-[500px] w-full rounded-none border-l-[0px] border-r-[0px] border-gray-800 bg-black text-gray-400 max-lg:h-full">
         <DrawerHeader>
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
           <DrawerDescription>This action cannot be undone.</DrawerDescription>

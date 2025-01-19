@@ -2,8 +2,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 
 import Avatar from "@/components/user/Avatar";
@@ -12,7 +10,7 @@ export default function StorieList() {
   const stories = Array.from({ length: 20 }, (_, i) => `${i}`);
 
   return (
-    <Carousel className="mb-4 w-full border-b-[1px] border-gray-600 p-2 transition-all duration-500 lg:w-[700px]">
+    <Carousel className="relative mb-4 w-full border-b-[1px] border-gray-600 p-2 transition-all duration-500 lg:w-[700px]">
       <CarouselContent>
         {stories.map((_, index) => (
           <CarouselItem
@@ -24,16 +22,6 @@ export default function StorieList() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious
-        variant={"secondary"}
-        size={"sm"}
-        className="max-lg:hidden"
-      />
-      <CarouselNext
-        variant={"secondary"}
-        size={"sm"}
-        className="max-lg:hidden"
-      />
     </Carousel>
   );
 }
