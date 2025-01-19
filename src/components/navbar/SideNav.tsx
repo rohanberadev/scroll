@@ -18,13 +18,13 @@ import Avatar from "@/components/user/Avatar";
 export default function SideNav() {
   return (
     <nav className="border-r-[1px] border-gray-600 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
-      <Link href={"#"} className="inline-flex">
+      <Link href={"/"} className="inline-flex">
         <h1 className="text-4xl">Scroll</h1>
       </Link>
       <ul className="mt-12 flex flex-col gap-y-10 text-lg">
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/"
             linkLabel="Home"
             FillIcon={GoHomeFill}
             OutlineIcon={GoHome}
@@ -32,7 +32,7 @@ export default function SideNav() {
         </li>
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/search"
             linkLabel="Search"
             FillIcon={RiSearchFill}
             OutlineIcon={RiSearchLine}
@@ -40,7 +40,7 @@ export default function SideNav() {
         </li>
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/explore"
             linkLabel="Explore"
             FillIcon={MdExplore}
             OutlineIcon={MdOutlineExplore}
@@ -48,7 +48,7 @@ export default function SideNav() {
         </li>
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/messages"
             linkLabel="Messages"
             FillIcon={AiFillMessage}
             OutlineIcon={AiOutlineMessage}
@@ -56,7 +56,7 @@ export default function SideNav() {
         </li>
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/notifications"
             linkLabel="Notifications"
             FillIcon={GoHeartFill}
             OutlineIcon={GoHeart}
@@ -64,14 +64,14 @@ export default function SideNav() {
         </li>
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/create"
             linkLabel="Create"
             FillIcon={MdAddToPhotos}
             OutlineIcon={MdOutlineAddToPhotos}
           />
         </li>
         <li>
-          <Link href={"#"}>
+          <Link href={"/profile"}>
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"

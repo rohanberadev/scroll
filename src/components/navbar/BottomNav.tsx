@@ -17,7 +17,7 @@ export default function BottomNav() {
       <ul className="flex w-full items-center justify-around">
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/"
             linkLabel="Home"
             FillIcon={GoHomeFill}
             OutlineIcon={GoHome}
@@ -26,7 +26,7 @@ export default function BottomNav() {
 
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/search"
             linkLabel="Search"
             FillIcon={RiSearchFill}
             OutlineIcon={RiSearchLine}
@@ -35,7 +35,7 @@ export default function BottomNav() {
 
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/create"
             linkLabel="Create"
             FillIcon={MdAddToPhotos}
             OutlineIcon={MdOutlineAddToPhotos}
@@ -44,7 +44,7 @@ export default function BottomNav() {
 
         <li>
           <NavLink
-            linkHref="#"
+            linkHref="/explore"
             linkLabel="Explore"
             FillIcon={MdExplore}
             OutlineIcon={MdOutlineExplore}
@@ -52,7 +52,7 @@ export default function BottomNav() {
         </li>
 
         <li>
-          <Link href={"#"}>
+          <Link href={"/profile"}>
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"

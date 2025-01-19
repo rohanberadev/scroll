@@ -15,7 +15,7 @@ export default function NavLink({
   OutlineIcon,
 }: Props) {
   return (
-    <Link href={linkHref}>
+    <Link href={linkHref} className="inline-block">
       <div className="flex items-center gap-x-8">
         <OutlineIcon className="text-2xl leading-none" />
         <span className="text-[1rem] leading-none max-lg:hidden">
