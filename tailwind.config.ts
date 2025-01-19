@@ -17,7 +17,7 @@ export default {
       },
       colors: {},
       height: {
-        "app-screen": "calc(100vh + 30px)",
+        "app-screen": "calc(100vh - 8rem)",
       },
       screens: {
         xs: "420px",

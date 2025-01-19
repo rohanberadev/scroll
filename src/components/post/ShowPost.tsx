@@ -11,30 +11,6 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-
-import { FaRegComment } from "react-icons/fa";
-import { FiSend } from "react-icons/fi";
-import { BsBookmark } from "react-icons/bs";
-import { TbDots } from "react-icons/tb";
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -42,6 +18,10 @@ import Link from "next/link";
 
 import Avatar from "@/components/user/Avatar";
 import LikeButton from "@/components/button/LikeButton";
+import CommentButton from "@/components/button/CommentButton";
+import ShareButton from "../button/ShareButton";
+import PostInfoButton from "../button/PostInfoButton";
+import SaveButton from "../button/SaveButton";
 
 const imageSrc1 =
   "https://plus.unsplash.com/premium_photo-1675127367513-7f4388aa9076?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bmF0dXJhbHxlbnwwfDF8MHx8fDA%3D";
@@ -100,56 +80,15 @@ function PostMedia() {
   );
 }
 
-function PostInfo() {
-  return (
-    <Dialog>
-      <DialogTrigger>
-        <TbDots className="h-6 w-6" />
-      </DialogTrigger>
-      <DialogContent className="h-56 w-full bg-black text-gray-400 max-lg:w-[90%] lg:left-[60%]">
-        <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function ShareDrawer() {
-  return (
-    <Drawer>
-      <DrawerTrigger>
-        <FiSend className="h-5 w-5" />
-      </DrawerTrigger>
-      <DrawerContent className="h-[400px] w-full bg-black text-gray-400">
-        <DrawerHeader>
-          <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-          <DrawerDescription>This action cannot be undone.</DrawerDescription>
-        </DrawerHeader>
-        <DrawerFooter>
-          <Button>Submit</Button>
-          <DrawerClose>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  );
-}
-
 export default function ShowPost() {
   return (
-    <Card className="max-xs:border-none flex w-[400px] flex-col rounded-sm bg-black text-stone-400 md:w-[425px] lg:w-[450px] lg:border-[1px] lg:border-gray-400">
+    <Card className="flex w-[400px] flex-col rounded-sm border-gray-600 bg-black text-stone-400 max-xs:rounded-none max-xs:border-l-[0px] max-xs:border-r-[0px] md:w-[425px] lg:w-[450px] lg:border-[1px]">
       <CardHeader className="flex w-full flex-row items-center justify-between border-b-[1px] border-gray-400 p-4">
         <Link href={"#"} className="flex items-center gap-x-4">
           <Avatar />
           <CardTitle>Username</CardTitle>
         </Link>
-        <PostInfo />
+        <PostInfoButton />
       </CardHeader>
       <CardContent className="w-full p-0">
         <PostMedia />
@@ -160,11 +99,12 @@ export default function ShowPost() {
             <LikeButton
               active={true}
               className="h-[1.4rem] w-[1.4rem] text-red-600"
+              likeCount={200}
             />
-            <FaRegComment className="h-5 w-5" />
-            <ShareDrawer />
+            <CommentButton className="h-5 w-5" commentCount={480} />
+            <ShareButton className="h-5 w-5" shareCount={20} />
           </div>
-          <BsBookmark className="h-5 w-5" />
+          <SaveButton />
         </div>
 
         <div className="flex w-full justify-start">
