@@ -6,6 +6,7 @@ type Props = {
   linkLabel: string;
   FillIcon: IconType;
   OutlineIcon: IconType;
+  active?: boolean;
 };
 
 export default function NavLink({
@@ -13,11 +14,16 @@ export default function NavLink({
   linkLabel,
   FillIcon,
   OutlineIcon,
+  active,
 }: Props) {
   return (
     <Link href={linkHref} className="inline-block">
       <div className="flex items-center gap-x-8">
-        <OutlineIcon className="text-2xl leading-none" />
+        {active ? (
+          <FillIcon className="text-2xl leading-none" />
+        ) : (
+          <OutlineIcon className="text-2xl leading-none" />
+        )}
         <span className="text-[1rem] leading-none max-lg:hidden">
           {linkLabel}
         </span>

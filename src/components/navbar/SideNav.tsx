@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import NavLink from "./NavLink";
+import { usePathname } from "next/navigation";
+
+import NavLink from "@/components/navbar/NavLink";
+import Avatar from "@/components/user/Avatar";
 
 import { GoHome } from "react-icons/go";
 import { GoHomeFill } from "react-icons/go";
@@ -13,9 +18,12 @@ import { GoHeart } from "react-icons/go";
 import { GoHeartFill } from "react-icons/go";
 import { MdOutlineAddToPhotos } from "react-icons/md";
 import { MdAddToPhotos } from "react-icons/md";
-import Avatar from "@/components/user/Avatar";
 
 export default function SideNav() {
+  const pathname = usePathname();
+
+  console.log(pathname);
+
   return (
     <nav className="border-r-[1px] border-gray-600 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
       <Link href={"/"} className="inline-flex">
@@ -28,6 +36,7 @@ export default function SideNav() {
             linkLabel="Home"
             FillIcon={GoHomeFill}
             OutlineIcon={GoHome}
+            active={pathname === "/"}
           />
         </li>
         <li>
@@ -36,6 +45,7 @@ export default function SideNav() {
             linkLabel="Search"
             FillIcon={RiSearchFill}
             OutlineIcon={RiSearchLine}
+            active={pathname === "/search"}
           />
         </li>
         <li>
@@ -44,6 +54,7 @@ export default function SideNav() {
             linkLabel="Explore"
             FillIcon={MdExplore}
             OutlineIcon={MdOutlineExplore}
+            active={pathname === "/explore"}
           />
         </li>
         <li>
@@ -52,6 +63,7 @@ export default function SideNav() {
             linkLabel="Messages"
             FillIcon={AiFillMessage}
             OutlineIcon={AiOutlineMessage}
+            active={pathname === "/messages"}
           />
         </li>
         <li>
@@ -60,6 +72,7 @@ export default function SideNav() {
             linkLabel="Notifications"
             FillIcon={GoHeartFill}
             OutlineIcon={GoHeart}
+            active={pathname === "/notifications"}
           />
         </li>
         <li>
@@ -68,6 +81,7 @@ export default function SideNav() {
             linkLabel="Create"
             FillIcon={MdAddToPhotos}
             OutlineIcon={MdOutlineAddToPhotos}
+            active={pathname === "/create"}
           />
         </li>
         <li>

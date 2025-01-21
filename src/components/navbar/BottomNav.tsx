@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import NavLink from "./NavLink";
+import { usePathname } from "next/navigation";
+
+import NavLink from "@/components/navbar/NavLink";
+import Avatar from "@/components/user/Avatar";
 
 import { GoHome } from "react-icons/go";
 import { GoHomeFill } from "react-icons/go";
@@ -9,9 +14,10 @@ import { MdOutlineExplore } from "react-icons/md";
 import { MdExplore } from "react-icons/md";
 import { MdOutlineAddToPhotos } from "react-icons/md";
 import { MdAddToPhotos } from "react-icons/md";
-import Avatar from "@/components/user/Avatar";
 
 export default function BottomNav() {
+  const pathname = usePathname();
+
   return (
     <nav className="fixed bottom-0 left-0 z-50 h-12 w-full border-t-[1px] border-gray-600 bg-black py-2 shadow-lg lg:hidden">
       <ul className="flex w-full items-center justify-around">
@@ -21,6 +27,7 @@ export default function BottomNav() {
             linkLabel="Home"
             FillIcon={GoHomeFill}
             OutlineIcon={GoHome}
+            active={pathname === "/"}
           />
         </li>
 
@@ -30,6 +37,7 @@ export default function BottomNav() {
             linkLabel="Search"
             FillIcon={RiSearchFill}
             OutlineIcon={RiSearchLine}
+            active={pathname === "/search"}
           />
         </li>
 
@@ -39,6 +47,7 @@ export default function BottomNav() {
             linkLabel="Create"
             FillIcon={MdAddToPhotos}
             OutlineIcon={MdOutlineAddToPhotos}
+            active={pathname === "/create"}
           />
         </li>
 
@@ -48,6 +57,7 @@ export default function BottomNav() {
             linkLabel="Explore"
             FillIcon={MdExplore}
             OutlineIcon={MdOutlineExplore}
+            active={pathname === "/explore"}
           />
         </li>
 
