@@ -66,6 +66,7 @@ export default function BottomNav() {
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
+              active={pathname === "/profile"}
             />
           </Link>
         </li>

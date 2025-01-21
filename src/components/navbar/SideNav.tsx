@@ -90,6 +90,7 @@ export default function SideNav() {
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
               AvatarLabel={<span className="text-[1rem]">Profile</span>}
+              active={pathname === "/profile"}
             />
           </Link>
         </li>

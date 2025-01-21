@@ -3,6 +3,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 type Props = {
   avatarContainerStyles?: string;
@@ -10,6 +11,7 @@ type Props = {
   avatarImageStyles?: string;
   avatarFallbackStyles?: string;
   AvatarLabel?: JSX.Element;
+  active?: boolean;
 };
 
 export default function Avatar({
@@ -18,6 +20,7 @@ export default function Avatar({
   avatarImageStyles,
   avatarFallbackStyles,
   AvatarLabel,
+  active,
 }: Props) {
   return (
     <AvatarLib className={avatarContainerStyles}>

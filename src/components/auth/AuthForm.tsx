@@ -12,35 +12,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import { api } from "@/trpc/react";
+import { signInFormSchema, signUpFormSchema } from "@/common/schema";
+
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useState } from "react";
+import { ClipLoader } from "react-spinners";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Props = {
   formButtonLabel: String;
 };
 
-const signInFormSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "Name must contain at least 3 character(s)" })
-    .max(20, { message: "Name must contain at most 20 character(s)" })
-    .refine((value) => !/[@#$%^&*()=+!:;'",/?`]/.test(value), {
-      message: "Username contains disallowed characters",
-    }),
-  password: z
-    .string()
-    .min(6, { message: "Password must contain at least 3 character(s)" }),
-});
-
-const signUpFormSchema = signInFormSchema.extend({
-  email: z
-    .string()
-    .min(1, { message: "Email is required" })
-    .email({ message: "Invalid email" }),
-});
-
 function SignInForm({ formButtonLabel }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -49,7 +41,28 @@ function SignInForm({ formButtonLabel }: Props) {
     },
   });
 
-  function onSubmit() {}
+  const formValues = form.watch();
+
+  async function onSubmit() {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    const response = await signIn("credentials", {
+      redirect: false,
+      ...formValues,
+    });
+
+    if (response?.error) {
+      setError(response.error);
+    } else {
+      form.reset();
+      setSuccess("User is logged in");
+      router.push("/");
+    }
+
+    setLoading(false);
+  }
 
   return (
     <Form {...form}>
@@ -86,11 +99,14 @@ function SignInForm({ formButtonLabel }: Props) {
           )}
         />
 
+        {error && <FormMessage>Invalid Credentials!</FormMessage>}
+
         <Button
           type="submit"
           className="transition-colors duration-500 hover:bg-stone-200 hover:text-black"
+          disabled={loading}
         >
-          {formButtonLabel}
+          {loading ? <ClipLoader size={24} color="white" /> : formButtonLabel}
         </Button>
       </form>
     </Form>
@@ -98,6 +114,10 @@ function SignInForm({ formButtonLabel }: Props) {
 }
 
 function SignUpForm({ formButtonLabel }: Props) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const form = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
@@ -107,7 +127,33 @@ function SignUpForm({ formButtonLabel }: Props) {
     },
   });
 
-  function onSubmit() {}
+  const formValues = form.watch();
+
+  const createUser = api.user.create.useMutation({
+    onMutate(opts) {
+      setLoading(true);
+    },
+
+    onSuccess(opts) {
+      setLoading(false);
+      setSuccess(opts.success);
+      form.reset();
+    },
+
+    onError(opts) {
+      setLoading(false);
+      setError(opts.message);
+      form.reset();
+    },
+  });
+
+  async function onSubmit() {
+    try {
+      await createUser.mutateAsync(formValues);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <Form {...form}>
@@ -117,9 +163,9 @@ function SignUpForm({ formButtonLabel }: Props) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="name..." {...field} />
+                <Input placeholder="username..." {...field} />
               </FormControl>
               <FormDescription>This is your public username.</FormDescription>
               <FormMessage />
@@ -161,11 +207,14 @@ function SignUpForm({ formButtonLabel }: Props) {
           )}
         />
 
+        {error && <FormMessage>{error}</FormMessage>}
+
         <Button
           type="submit"
           className="transition-colors duration-500 hover:bg-stone-200 hover:text-black"
+          disabled={loading}
         >
-          {formButtonLabel}
+          {loading ? <ClipLoader size={24} color="white" /> : formButtonLabel}
         </Button>
       </form>
     </Form>
