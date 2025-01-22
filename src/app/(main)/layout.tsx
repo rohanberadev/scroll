@@ -1,7 +1,6 @@
 import AppHeader from "@/components/AppHeader";
 import BottomNav from "@/components/navbar/BottomNav";
 import SideNav from "@/components/navbar/SideNav";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function AppLayout({
   children,

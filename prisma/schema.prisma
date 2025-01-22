@@ -21,6 +21,7 @@ model User {
     followers BigInt   @default(0)
     following BigInt   @default(0)
     posts     BigInt   @default(0)
+    status    PostType @default(DRAFT)
     createdAt DateTime @default(now())
     updatedAt DateTime
 
@@ -227,6 +228,12 @@ enum UserRole {
     USER
     ADMIN
     BANNED
+}
+
+enum PostType {
+    DRAFT
+    PRIVATE
+    PUBLIC
 }
 
 enum ReportType {
