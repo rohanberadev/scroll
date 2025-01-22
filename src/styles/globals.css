@@ -16,8 +16,8 @@
   /* Hide scrollbar for IE, Edge and Firefox */
   /* Style the scrollbar */
   ::-webkit-scrollbar {
-    width: 8px; /* Adjust width of the scrollbar */
-    height: 8px; /* Adjust height of horizontal scrollbar */
+    width: 3px; /* Adjust width of the scrollbar */
+    height: 4px; /* Adjust height of horizontal scrollbar */
   }
 
   /* Style the scrollbar track (background) */
@@ -39,7 +39,7 @@
 
   @media (min-width: 380px) and (max-width: 760px) {
     ::-webkit-scrollbar {
-      width: 6px; /* Adjust width of the scrollbar */
+      width: 3px; /* Adjust width of the scrollbar */
       height: 4px; /* Adjust height of horizontal scrollbar */
     }
   }
