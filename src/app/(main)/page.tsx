@@ -13,7 +13,7 @@ export default function Home() {
     <div className="flex w-full flex-col items-center lg:pt-12">
       <StorieList />
 
-      <div className="flex flex-col items-center gap-y-12 py-4">
+      <div className="flex flex-col items-center lg:gap-y-12 lg:py-4">
         {posts.map((_, index) => (
           <ShowPost key={index} />
         ))}

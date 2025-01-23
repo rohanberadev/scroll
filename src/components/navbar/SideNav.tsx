@@ -25,7 +25,7 @@ export default function SideNav() {
   console.log(pathname);
 
   return (
-    <nav className="border-r-[1px] border-gray-600 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
+    <nav className="fixed left-0 top-0 h-screen border-r-[1px] border-gray-600 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
       <Link href={"/"} className="inline-flex">
         <h1 className="text-4xl">Scroll</h1>
       </Link>

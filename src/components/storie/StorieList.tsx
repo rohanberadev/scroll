@@ -10,7 +10,7 @@ export default function StorieList() {
   const stories = Array.from({ length: 20 }, (_, i) => `${i}`);
 
   return (
-    <Carousel className="relative mb-4 w-full border-b-[1px] border-gray-600 p-2 transition-all duration-500 lg:w-[700px]">
+    <Carousel className="relative w-full border-b-[1px] border-gray-600 p-2 transition-all duration-500 lg:mb-4 lg:w-[700px]">
       <CarouselContent>
         {stories.map((_, index) => (
           <CarouselItem
