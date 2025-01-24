@@ -82,7 +82,7 @@ function PostMedia() {
 
 export default function ShowPost() {
   return (
-    <Card className="flex w-[400px] flex-col rounded-sm border-gray-600 bg-black text-stone-400 max-xs:border-l-0 max-xs:border-r-0 max-xs:border-t-0 md:w-[425px] lg:w-[450px] lg:border-[1px]">
+    <Card className="flex w-[400px] flex-col rounded-sm border-gray-600 bg-black text-stone-400 max-xs:rounded-none max-xs:border-l-0 max-xs:border-r-0 max-xs:border-t-0 md:w-[425px] lg:w-[450px] lg:border-[1px]">
       <CardHeader className="flex w-full flex-row items-center justify-between border-b-[1px] border-gray-400 p-4">
         <Link href={"#"} className="flex items-center gap-x-4">
           <Avatar />

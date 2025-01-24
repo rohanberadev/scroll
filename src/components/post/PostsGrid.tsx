@@ -17,8 +17,9 @@ function Post({ url }: { url: string }) {
   return (
     <div
       className="relative select-none"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      onMouseOver={() => setHover(true)}
+      onMouseOut={() => setHover(false)}
+      onClick={() => console.log("clicked")}
     >
       <AspectRatio
         ratio={1 / 1}
@@ -34,14 +35,14 @@ function Post({ url }: { url: string }) {
           "absolute left-1/2 top-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-300",
           hover ? "flex items-center gap-x-8 lg:gap-x-12" : "",
         )}
-        onMouseEnter={() => setHover(true)}
+        onMouseOver={() => setHover(true)}
       >
         <div className="flex flex-col items-center">
-          <GoHeartFill className="h-6 w-4 text-white lg:h-6 lg:w-6" />
+          <GoHeartFill className="h-5 w-5 text-white lg:h-6 lg:w-6" />
           <span className="text-white max-lg:text-xs">12</span>
         </div>
         <div className="flex flex-col items-center">
-          <FaComment className="h-6 w-4 text-white lg:h-6 lg:w-6" />
+          <FaComment className="h-5 w-5 text-white lg:h-6 lg:w-6" />
           <span className="text-white max-lg:text-xs">12</span>
         </div>
       </div>

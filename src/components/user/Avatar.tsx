@@ -26,14 +26,10 @@ export default function Avatar({
     <AvatarLib className={avatarContainerStyles}>
       <AvatarImage
         src="https://github.com/shadcn.png"
-        className={avatarImageStyles}
+        className={cn("select-none", avatarImageStyles)}
       />
       <AvatarFallback className={avatarFallbackStyles}>CN</AvatarFallback>
       {AvatarLabel}
     </AvatarLib>
   );
 }
-
-/*
-
-*/

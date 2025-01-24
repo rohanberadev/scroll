@@ -8,7 +8,6 @@ export default function Search() {
         <Input placeholder="Search..." className="rounded-sm py-2" />
       </div>
       <SearchTabs />
-      {/* <div className="flex h-full w-full flex-col gap-y-2 rounded-md border-[1px] border-gray-800 max-lg:border-none"></div> */}
     </div>
   );
 }
