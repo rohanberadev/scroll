@@ -1,10 +1,13 @@
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CreatePost from "@/components/post/CreatePost";
+import CreatePostTabs from "@/components/tabs/CreatePostTabs";
 
 export default function Create() {
   return (
-    <div className="flex h-full w-full flex-col gap-6 p-4 lg:w-[700px]">
-      <div className="h-full w-full rounded-md border-[1px] border-gray-800 max-lg:border-none"></div>
+    <div className="flex h-full w-full flex-col lg:w-[700px] lg:p-4">
+      <div className="w-full border-gray-800 max-lg:border-b-[1px] max-lg:p-4 lg:mb-4">
+        <CreatePost />
+      </div>
+      <CreatePostTabs />
     </div>
   );
 }

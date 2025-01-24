@@ -11,33 +11,35 @@ datasource db {
 }
 
 model User {
-    id        String   @id @default(cuid())
-    name      String   @unique
-    email     String   @unique
+    id        String     @id @default(cuid())
+    name      String     @unique
+    email     String     @unique
     password  String
     image     String?
-    role      UserRole @default(USER)
+    role      UserRole   @default(USER)
     bio       String?
-    followers BigInt   @default(0)
-    following BigInt   @default(0)
-    posts     BigInt   @default(0)
-    status    PostType @default(DRAFT)
-    createdAt DateTime @default(now())
+    followers BigInt     @default(0)
+    following BigInt     @default(0)
+    posts     BigInt     @default(0)
+    status    UserStatus @default(OFFLINE)
+    createdAt DateTime   @default(now())
     updatedAt DateTime
 
     Post                Post[]
     View                View[]
     Like                Like[]
     Comment             Comment[]
+    SavedPost           SavedPost[]
     Follower            Follower[]      @relation("FollowerUser")
     Following           Follower[]      @relation("FollowingUser")
     SharedByUser        Share[]         @relation("SharedByUser")
     SharedToUser        Share[]         @relation("SharedToUser")
     FollowRequestByUser FollowRequest[] @relation("FollowRequestByUser")
     FollowRequestToUser FollowRequest[] @relation("FollowRequestToUser")
-    UserReport          UserReport[]
-    SavedPost           SavedPost[]
-    Storie              Storie[]
+    ReportedByUser      UserReport[]    @relation("ReportedByUser")
+    ReportedToUser      UserReport[]    @relation("ReportedToUser")
+    PostReort           PostReort[]
+    CommentReport       CommentReport[]
 
     @@index([name])
     @@index([email])
@@ -52,6 +54,7 @@ model Post {
     shares     BigInt   @default(0)
     comments   BigInt   @default(0)
     views      BigInt   @default(0)
+    status     PostType @default(DRAFT)
     postedById String
     postedAt   DateTime @default(now())
     updatedAt  DateTime @updatedAt
@@ -65,17 +68,6 @@ model Post {
     SavedPost SavedPost[]
 
     @@index([postedById])
-}
-
-model Storie {
-    id         String   @id @default(cuid())
-    postedById String
-    media      String
-    caption    String
-    postedAt   DateTime @default(now())
-    expiredAt  DateTime
-
-    postedBy User @relation(fields: [postedById], references: [id])
 }
 
 model RefreshToken {
@@ -189,37 +181,46 @@ model FollowRequest {
 
 model UserReport {
     id           String     @id @default(cuid())
+    reportedById String
     reportedToId String
     reportType   ReportType
     description  String?
     reportedAt   DateTime   @default(now())
 
-    reportedTo User @relation(fields: [reportedToId], references: [id])
+    reportedBy User @relation("ReportedByUser", fields: [reportedById], references: [id])
+    reportedTo User @relation("ReportedToUser", fields: [reportedToId], references: [id])
 
+    @@unique([reportedById, reportedToId])
     @@index([reportedToId])
 }
 
 model PostReort {
     id           String     @id @default(cuid())
+    reportedById String
     reportedToId String
     reportType   ReportType
     description  String?
     reportedAt   DateTime   @default(now())
 
+    reportedBy User @relation(fields: [reportedById], references: [id])
     reportedTo Post @relation(fields: [reportedToId], references: [id])
 
+    @@unique([reportedById, reportedToId])
     @@index([reportedToId])
 }
 
 model CommentReport {
     id           String     @id @default(cuid())
+    reportedById String
     reportedToId String
     reportType   ReportType
     description  String?
     reportedAt   DateTime   @default(now())
 
+    reportedBy User    @relation(fields: [reportedById], references: [id])
     reportedTo Comment @relation(fields: [reportedToId], references: [id])
 
+    @@unique([reportedById, reportedToId])
     @@index([reportedToId])
 }
 
@@ -228,6 +229,11 @@ enum UserRole {
     USER
     ADMIN
     BANNED
+}
+
+enum UserStatus {
+    ONLINE
+    OFFLINE
 }
 
 enum PostType {

@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 import MyTabsTrigger from "./MyTabsTrigger";
 import PostsGrid from "@/components/post/PostsGrid";
 import TabsContainer from "@/components/tabs/TabsContainer";

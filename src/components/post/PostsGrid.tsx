@@ -6,6 +6,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { GoHeartFill } from "react-icons/go";
 import { FaComment } from "react-icons/fa";
+import { motion } from "motion/react";
 
 type Props = {
   heightMinusOffset: number;
@@ -15,10 +16,10 @@ function Post({ url }: { url: string }) {
   const [hover, setHover] = useState(false);
 
   return (
-    <div
+    <motion.div
       className="relative select-none"
-      onMouseOver={() => setHover(true)}
-      onMouseOut={() => setHover(false)}
+      onHoverStart={() => setHover(true)}
+      onHoverEnd={() => setHover(false)}
       onClick={() => console.log("clicked")}
     >
       <AspectRatio
@@ -30,12 +31,12 @@ function Post({ url }: { url: string }) {
       >
         <Image src={url} fill alt="image" />
       </AspectRatio>
-      <div
+      <motion.div
         className={cn(
-          "absolute left-1/2 top-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-300",
+          "absolute left-1/2 top-1/2 z-40 hidden -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-300",
           hover ? "flex items-center gap-x-8 lg:gap-x-12" : "",
         )}
-        onMouseOver={() => setHover(true)}
+        onHoverStart={() => setHover(true)}
       >
         <div className="flex flex-col items-center">
           <GoHeartFill className="h-5 w-5 text-white lg:h-6 lg:w-6" />
@@ -45,8 +46,8 @@ function Post({ url }: { url: string }) {
           <FaComment className="h-5 w-5 text-white lg:h-6 lg:w-6" />
           <span className="text-white max-lg:text-xs">12</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
