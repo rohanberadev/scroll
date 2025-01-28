@@ -47,7 +47,7 @@ model User {
 
 model Post {
     id         String   @id @default(cuid())
-    media      String
+    mediaUrls  String[]
     caption    String?
     hashtags   String[]
     likes      BigInt   @default(0)

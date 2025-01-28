@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -11,6 +13,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { type CarouselApi } from "@/components/ui/carousel";
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -22,6 +25,7 @@ import CommentButton from "@/components/button/CommentButton";
 import ShareButton from "../button/ShareButton";
 import PostInfoButton from "../button/PostInfoButton";
 import SaveButton from "../button/SaveButton";
+import { useEffect, useState } from "react";
 
 const imageSrc1 =
   "https://plus.unsplash.com/premium_photo-1675127367513-7f4388aa9076?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bmF0dXJhbHxlbnwwfDF8MHx8fDA%3D";
@@ -32,10 +36,31 @@ const imageSrc2 =
 const imageSrc3 =
   "https://images.pexels.com/photos/1955134/pexels-photo-1955134.jpeg?auto=compress&cs=tinysrgb&w=600";
 
-const imageArray = [imageSrc1, imageSrc2, imageSrc3];
+const imageSrc4 =
+  "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg";
+
+const imageArray = [imageSrc1, imageSrc2, imageSrc3, imageSrc4];
 
 function PostMedia() {
-  function Dots({ count, current }: { count: number; current: number }) {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+  }, [api]);
+
+  const Dots = ({ count, current }: { count: number; current: number }) => {
     const iterator = Array.from({ length: count });
 
     return (
@@ -51,10 +76,10 @@ function PostMedia() {
         ))}
       </div>
     );
-  }
+  };
 
   return (
-    <Carousel className="relative">
+    <Carousel className="relative" setApi={setApi}>
       <CarouselContent className="-ml-0">
         {imageArray.map((imageUrl, index) => (
           <CarouselItem
@@ -74,7 +99,7 @@ function PostMedia() {
       </CarouselContent>
 
       {imageArray.length > 1 ? (
-        <Dots count={imageArray.length} current={0} />
+        <Dots count={imageArray.length} current={current} />
       ) : null}
     </Carousel>
   );

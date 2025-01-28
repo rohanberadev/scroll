@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { GoHeartFill } from "react-icons/go";
 import { FaComment } from "react-icons/fa";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 type Props = {
   heightMinusOffset: number;
@@ -59,7 +60,9 @@ export default function PostsGrid({ heightMinusOffset }: Props) {
   return (
     <div className="grid w-full grid-cols-3">
       {array.map((url, index) => (
-        <Post key={index} url={url} />
+        <Link href={`/posts/${index}`} key={index}>
+          <Post url={url} />
+        </Link>
       ))}
     </div>
   );

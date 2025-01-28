@@ -4,6 +4,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
+import { createPostFormSchema } from "@/common/schema";
 
 export const testRouter = createTRPCRouter({
   generate: publicProcedure.query(async function* () {
@@ -18,4 +19,12 @@ export const testRouter = createTRPCRouter({
     .query(async function ({ ctx, input }) {
       return { title: input.id };
     }),
+
+  upload: publicProcedure.input(createPostFormSchema).mutation(async function ({
+    ctx,
+    input,
+  }) {
+    console.log(input);
+    return { success: "Hey" };
+  }),
 });
