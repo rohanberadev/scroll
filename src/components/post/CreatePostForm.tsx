@@ -12,22 +12,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import Cropper, { type Area as CroppedAreaPixels } from "react-easy-crop";
-import { debounce } from "lodash";
 
-import { useDialog, useFiles } from "@/common/store";
-import { useCallback, useEffect, useState } from "react";
+import { useDrawer, useFiles } from "@/common/store";
+import { useEffect, useState } from "react";
+import ImageCropDrawer from "./ImageCropDrawer";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formSchema = z.object({
@@ -35,9 +27,8 @@ const formSchema = z.object({
     .string()
     .min(3, { message: "Description should be atleast 3 character(s) long." }),
   media: z
-    .any({
-      message: "Please select a file.",
-    })
+    .instanceof(File)
+    .optional()
     .refine((file) => file instanceof File && file.size <= 1024 * 1024 * 5, {
       message: "File size must be smaller than 5MB.",
     })
@@ -49,59 +40,44 @@ const formSchema = z.object({
     ),
 });
 
-const ImageDialog = ({ file }: { file: File }) => {
+const ImagePreview = ({ file }: { file: File }) => {
   const [src, setSrc] = useState<string | undefined>(undefined);
-  // const src = URL.createObjectURL(file);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] =
-    useState<CroppedAreaPixels | null>(null);
-
-  const onCropComplete = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (_: any, croppedAreaPixels: CroppedAreaPixels) => {
-      if (src) {
-        console.log("called");
-        setCroppedAreaPixels(croppedAreaPixels);
-      }
-    },
-    [src],
-  );
-
-  const onImageLoad = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (file: File) => {
-      setSrc(URL.createObjectURL(file));
-    },
-    [],
-  );
 
   useEffect(() => {
-    onImageLoad(file);
-    console.log("hey render");
+    setSrc(URL.createObjectURL(file));
+
+    return () => {
+      if (src) {
+        URL.revokeObjectURL(src);
+      }
+    };
   }, []);
 
-  return (
-    <AspectRatio ratio={5 / 6}>
-      {src && (
-        <Cropper
-          image={src}
-          crop={crop}
-          zoom={zoom}
-          aspect={5 / 6}
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={onCropComplete}
-        />
-      )}
-    </AspectRatio>
-  );
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt="Preview"
+        className="object-cover"
+        width={300}
+        height={400}
+      />
+    );
+  }
+};
+
+const ImagePreviewList = ({ files }: { files: File[] }) => {
+  return files.map((file, index) => <ImagePreview file={file} key={index} />);
 };
 
 export default function CreatePostForm() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { files, setFiles, currentFile, setCurrentFile } = useFiles();
-  const { isOpen, onClose, onOpen } = useDialog();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { isOpen, onOpen, onClose } = useDrawer();
+
+  console.log(currentFile);
 
   const convertArrayToFileList = (filesArray: File[]) => {
     const dataTransfer = new DataTransfer();
@@ -159,7 +135,7 @@ export default function CreatePostForm() {
                 <Input
                   className="hidden"
                   id="file"
-                  placeholder="caption"
+                  placeholder="media"
                   {...fieldProps}
                   type="file"
                   accept="images/*"
@@ -172,38 +148,19 @@ export default function CreatePostForm() {
                 />
               </FormControl>
 
-              <Dialog
-                open={isOpen}
-                onOpenChange={() => {
-                  setCurrentFile(undefined);
-                  onClose();
-                }}
-              >
-                <DialogContent className="bg-black lg:absolute lg:left-[60%]">
-                  <DialogHeader>
-                    <DialogTitle>This is the image preview</DialogTitle>
-                    {/* <DialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your account and remove your data from our servers.
-                    </DialogDescription> */}
-                  </DialogHeader>
-                  {currentFile && <ImageDialog file={currentFile} />}
-                </DialogContent>
-              </Dialog>
+              {files && <ImagePreviewList files={files} />}
 
-              {/* {files.map((file, index) => {
-                const src = URL.createObjectURL(file);
-                return (
-                  <Image
-                    key={index}
-                    src={src}
-                    alt={`Preview ${index}`}
-                    className="object-cover"
-                    width={300}
-                    height={400}
-                  />
-                );
-              })} */}
+              {currentFile && (
+                <ImageCropDrawer
+                  currentFile={currentFile}
+                  files={files}
+                  setFiles={setFiles}
+                  isOpen={isOpen}
+                  onOpen={onOpen}
+                  onClose={onClose}
+                  setCurrentFile={setCurrentFile}
+                />
+              )}
 
               <Button
                 className="flex"

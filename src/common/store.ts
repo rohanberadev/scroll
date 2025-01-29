@@ -13,12 +13,12 @@ export const useFiles = create<FilesProps>((set) => ({
   setFiles: (file) => set((state) => ({ files: [...state.files, file] })),
 }));
 
-interface DialogProps {
+interface DrawerProps {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
 }
-export const useDialog = create<DialogProps>((set) => ({
+export const useDrawer = create<DrawerProps>((set) => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),

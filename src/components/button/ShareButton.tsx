@@ -44,7 +44,7 @@ export default function ShareButton({ className, shareCount }: Props) {
         </ScrollArea>
         <DrawerFooter className="flex flex-row">
           <Button>Share</Button>
-          <DrawerClose>
+          <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
