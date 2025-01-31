@@ -26,7 +26,7 @@ export const userRouter = createTRPCRouter({
           updatedAt: new Date(),
         },
       });
-    } catch (error: any) {
+    } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"

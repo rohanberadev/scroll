@@ -16,10 +16,12 @@ type Props = {
 
 export default function Avatar({
   avatarContainerStyles,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   avatarImageUrl,
   avatarImageStyles,
   avatarFallbackStyles,
   AvatarLabel,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   active,
 }: Props) {
   return (

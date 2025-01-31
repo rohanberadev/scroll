@@ -1,9 +1,5 @@
 "use client";
 
-import { auth } from "@/server/auth";
-import { api } from "@/trpc/react";
-
-import StorieList from "@/components/storie/StorieList";
 import ShowPost from "@/components/post/ShowPost";
 
 export default function Home() {

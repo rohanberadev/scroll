@@ -42,7 +42,7 @@ export const authConfig = {
         password: { label: "Password", type: "password..." },
       },
 
-      async authorize(credentials, request) {
+      async authorize(credentials) {
         const creds = await signInFormSchema.safeParseAsync(credentials);
 
         if (!creds.success) {

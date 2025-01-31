@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { signInFormSchema, signUpFormSchema } from "@/common/schema";
 
-import { z } from "zod";
+import { type z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -24,12 +24,13 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 type Props = {
-  formButtonLabel: String;
+  formButtonLabel: string;
 };
 
 function SignInForm({ formButtonLabel }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [success, setSuccess] = useState("");
   const router = useRouter();
 
@@ -116,6 +117,7 @@ function SignInForm({ formButtonLabel }: Props) {
 function SignUpForm({ formButtonLabel }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [success, setSuccess] = useState("");
 
   const form = useForm<z.infer<typeof signUpFormSchema>>({
@@ -130,7 +132,7 @@ function SignUpForm({ formButtonLabel }: Props) {
   const formValues = form.watch();
 
   const createUser = api.user.create.useMutation({
-    onMutate(opts) {
+    onMutate() {
       setLoading(true);
     },
 

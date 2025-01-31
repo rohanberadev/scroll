@@ -1,5 +1,4 @@
 import CreatePostForm from "@/components/post/CreatePostForm";
-import CreatePostTabs from "@/components/tabs/CreatePostTabs";
 
 export default function Create() {
   return (

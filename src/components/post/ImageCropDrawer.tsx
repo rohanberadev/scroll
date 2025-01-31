@@ -8,12 +8,10 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 
 import { useCallback, useEffect, useState } from "react";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Cropper, { type Area as CroppedAreaPixels } from "react-easy-crop";
 
 type ImageCropperProps = {
@@ -22,9 +20,11 @@ type ImageCropperProps = {
   setFiles: (file: File) => void;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ImageCropper = ({ src, files, setFiles }: ImageCropperProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [croppedAreaPixels, setCroppedAreaPixels] =
     useState<CroppedAreaPixels | null>(null);
 
@@ -75,6 +75,7 @@ const MyDrawerContent = ({
         URL.revokeObjectURL(src);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -97,6 +98,7 @@ type ImageCropDrawer = {
 
 export default function ImageCropDrawer({
   isOpen,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onOpen,
   onClose,
   currentFile,

@@ -1,16 +1,7 @@
 "use client";
 
-import { createPostFormSchema } from "@/common/schema";
+// import { createPostFormSchema } from "@/common/schema";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -61,6 +52,7 @@ const ImagePreview = ({ file }: { file: File }) => {
         URL.revokeObjectURL(src);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (src) {
@@ -77,6 +69,7 @@ const ImagePreview = ({ file }: { file: File }) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ImagePreviewList = ({ files }: { files: File[] }) => {
   return files.map((file, index) => <ImagePreview file={file} key={index} />);
 };
@@ -89,6 +82,7 @@ export default function CreatePostForm() {
 
   console.log(currentFile);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const convertArrayToFileList = (filesArray: File[]) => {
     const dataTransfer = new DataTransfer();
     filesArray.forEach((file) => {
@@ -98,7 +92,7 @@ export default function CreatePostForm() {
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(createPostFormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       caption: "",
       media: undefined,

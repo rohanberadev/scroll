@@ -52,10 +52,11 @@ function Post({ url }: { url: string }) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function PostsGrid({ heightMinusOffset }: Props) {
   const imageUrl =
     "https://images.unsplash.com/photo-1517135399940-2855f5be7c4b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bmF0dXJhbHxlbnwwfHwwfHx8MA%3D%3D";
-  const array = Array.from({ length: 15 }, (_, i) => imageUrl);
+  const array = Array.from({ length: 15 }, (_, _i) => imageUrl);
 
   return (
     <div className="grid w-full grid-cols-3">
