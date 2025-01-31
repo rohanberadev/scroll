@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -256,3 +257,263 @@ enum ReportType {
     GRAPHIC_CONTENT
     OTHER
 }
+=======
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  email     String     @unique
+  password  String
+  image     String?
+  role      UserRole   @default(USER)
+  bio       String?
+  followers BigInt     @default(0)
+  following BigInt     @default(0)
+  posts     BigInt     @default(0)
+  status    UserStatus @default(OFFLINE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+
+  Post                Post[]
+  View                View[]
+  Like                Like[]
+  Comment             Comment[]
+  SavedPost           SavedPost[]
+  Follower            Follower[]      @relation("FollowerUser")
+  Following           Follower[]      @relation("FollowingUser")
+  SharedByUser        Share[]         @relation("SharedByUser")
+  SharedToUser        Share[]         @relation("SharedToUser")
+  FollowRequestByUser FollowRequest[] @relation("FollowRequestByUser")
+  FollowRequestToUser FollowRequest[] @relation("FollowRequestToUser")
+  ReportedByUser      UserReport[]    @relation("ReportedByUser")
+  ReportedToUser      UserReport[]    @relation("ReportedToUser")
+  PostReort           PostReort[]
+  CommentReport       CommentReport[]
+
+  @@index([name])
+  @@index([email])
+}
+
+model Post {
+  id         String   @id @default(cuid())
+  mediaUrls  String[]
+  caption    String?
+  hashtags   String[]
+  likes      BigInt   @default(0)
+  shares     BigInt   @default(0)
+  comments   BigInt   @default(0)
+  views      BigInt   @default(0)
+  type       PostType @default(DRAFT)
+  postedById String
+  postedAt   DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  createdBy User        @relation(fields: [postedById], references: [id])
+  View      View[]
+  Like      Like[]
+  Comment   Comment[]
+  Share     Share[]
+  PostReort PostReort[]
+  SavedPost SavedPost[]
+
+  @@index([postedById])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model View {
+  id         String   @id @default(cuid())
+  postId     String
+  viewedById String
+  viewedAt   DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id])
+  viewer User @relation(fields: [viewedById], references: [id])
+
+  @@index([postId, viewedById])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  likedById String
+  likedAt   DateTime @default(now())
+
+  post    Post @relation(fields: [postId], references: [id])
+  likedBy User @relation(fields: [likedById], references: [id])
+}
+
+model Share {
+  id         String   @id @default(cuid())
+  postId     String
+  sharedById String
+  sharedToId String
+  sharedAt   DateTime @default(now())
+
+  post     Post @relation(fields: [postId], references: [id])
+  sharedBy User @relation("SharedByUser", fields: [sharedById], references: [id])
+  sharedTo User @relation("SharedToUser", fields: [sharedToId], references: [id])
+
+  @@unique([sharedById, sharedToId])
+  @@index([postId])
+}
+
+model Comment {
+  id           String   @id @default(cuid())
+  content      String
+  parentId     String?
+  postId       String
+  commetedById String
+  likes        BigInt   @default(0)
+  commentedAt  DateTime @default(now())
+  updatedAt    DateTime
+
+  parent      Comment? @relation("CommentToParent", fields: [parentId], references: [id])
+  post        Post     @relation(fields: [postId], references: [id])
+  commentedBy User     @relation(fields: [commetedById], references: [id])
+
+  replies       Comment[]       @relation("CommentToParent")
+  CommentReport CommentReport[]
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  postId    String
+  savedById String
+  savedAt   DateTime @default(now())
+
+  post    Post @relation(fields: [postId], references: [id])
+  savedBy User @relation(fields: [savedById], references: [id])
+}
+
+model Follower {
+  id          String @id @default(cuid())
+  followerId  String
+  followingId String
+
+  follower  User @relation("FollowerUser", fields: [followerId], references: [id])
+  following User @relation("FollowingUser", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model FollowRequest {
+  id            String   @id @default(cuid())
+  requestedById String
+  requestedToId String
+  requestedAt   DateTime @default(now())
+
+  requestedBy User @relation("FollowRequestByUser", fields: [requestedById], references: [id])
+  requestedTo User @relation("FollowRequestToUser", fields: [requestedToId], references: [id])
+
+  @@unique([requestedById, requestedToId])
+  @@index([requestedById])
+  @@index([requestedToId])
+}
+
+model UserReport {
+  id           String     @id @default(cuid())
+  reportedById String
+  reportedToId String
+  reportType   ReportType
+  description  String?
+  reportedAt   DateTime   @default(now())
+
+  reportedBy User @relation("ReportedByUser", fields: [reportedById], references: [id])
+  reportedTo User @relation("ReportedToUser", fields: [reportedToId], references: [id])
+
+  @@unique([reportedById, reportedToId])
+  @@index([reportedToId])
+}
+
+model PostReort {
+  id           String     @id @default(cuid())
+  reportedById String
+  reportedToId String
+  reportType   ReportType
+  description  String?
+  reportedAt   DateTime   @default(now())
+
+  reportedBy User @relation(fields: [reportedById], references: [id])
+  reportedTo Post @relation(fields: [reportedToId], references: [id])
+
+  @@unique([reportedById, reportedToId])
+  @@index([reportedToId])
+}
+
+model CommentReport {
+  id           String     @id @default(cuid())
+  reportedById String
+  reportedToId String
+  reportType   ReportType
+  description  String?
+  reportedAt   DateTime   @default(now())
+
+  reportedBy User    @relation(fields: [reportedById], references: [id])
+  reportedTo Comment @relation(fields: [reportedToId], references: [id])
+
+  @@unique([reportedById, reportedToId])
+  @@index([reportedToId])
+}
+
+// enums
+enum UserRole {
+  USER
+  ADMIN
+  BANNED
+}
+
+enum UserStatus {
+  ONLINE
+  OFFLINE
+}
+
+enum PostType {
+  DRAFT
+  PRIVATE
+  PUBLIC
+}
+
+enum ReportType {
+  HARASSMENT
+  IMPERSONATION
+  SPAM
+  OFFENSIVE_CONTENT
+  FRAUD
+  HATE_SPEECH
+  INAPPROPRIATE_PROFILE
+  MISINFORMATION
+  VIOLENCE_THREATS
+  COPYRIGHT_VIOLATION
+  GRAPHIC_CONTENT
+  OTHER
+}
+>>>>>>> 25b580c869b1cdc966040dbcb0cfd347906db2fc
