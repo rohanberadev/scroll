@@ -1,12 +1,10 @@
 "use client";
 
-import { AiOutlineMessage } from "react-icons/ai";
-import { AiFillMessage } from "react-icons/ai";
-import { GoHeart } from "react-icons/go";
-import { GoHeartFill } from "react-icons/go";
 import NavLink from "@/components/navbar/NavLink";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AiFillMessage, AiOutlineMessage } from "react-icons/ai";
+import { GoHeart, GoHeartFill } from "react-icons/go";
 
 export default function AppHeader() {
   const pathname = usePathname();

@@ -1,5 +1,7 @@
 "use client";
 
+import { useCroppedImage } from "@/common/store";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -9,10 +11,9 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-
 import { useCallback, useEffect, useState } from "react";
 import Cropper, { type Area as CroppedAreaPixels } from "react-easy-crop";
+import getCroppedImage from "./cropImage";
 
 type ImageCropperProps = {
   src: string;
@@ -24,21 +25,25 @@ type ImageCropperProps = {
 const ImageCropper = ({ src, files, setFiles }: ImageCropperProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [croppedAreaPixels, setCroppedAreaPixels] =
-    useState<CroppedAreaPixels | null>(null);
+  const { setCroppedAreaPixels } = useCroppedImage();
 
   const onCropComplete = useCallback(
-    (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      croppedArea: any,
-      croppedAreaPixels: CroppedAreaPixels,
-    ) => {
+    (croppedArea: unknown, croppedAreaPixels: CroppedAreaPixels) => {
       setCroppedAreaPixels(croppedAreaPixels);
-      console.log(croppedAreaPixels);
     },
-    [],
+    [setCroppedAreaPixels],
   );
+
+  // const showCroppedImage = useCallback(async () => {
+  //   try {
+  //     if (croppedAreaPixels) {
+  //       const croppedImage = await getCroppedImage(src, croppedAreaPixels);
+  //       setCroppedImage(croppedImage);
+  //     }
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }, [croppedAreaPixels, src, setCroppedImage]);
 
   return (
     <Cropper
@@ -65,23 +70,19 @@ const MyDrawerContent = ({
   files,
   setFiles,
 }: MyDrawerContentProps) => {
-  const [src, setSrc] = useState<string | undefined>(undefined);
+  // const [src, setSrc] = useState<string | undefined>(undefined);
+  const { setMainImage, mainImage } = useCroppedImage();
 
   useEffect(() => {
-    setSrc(URL.createObjectURL(currentFile));
-
-    return () => {
-      if (src) {
-        URL.revokeObjectURL(src);
-      }
-    };
+    setMainImage(URL.createObjectURL(currentFile));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    // absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center
     <div className="absolute left-1/2 top-1/2 h-[500px] w-full -translate-x-1/2 -translate-y-1/2">
-      {src && <ImageCropper src={src} files={files} setFiles={setFiles} />}
+      {mainImage && (
+        <ImageCropper src={mainImage} files={files} setFiles={setFiles} />
+      )}
     </div>
   );
 };
@@ -111,6 +112,18 @@ export default function ImageCropDrawer({
     onClose();
   };
 
+  const { croppedAreaPixels, mainImage, setCroppedImage } = useCroppedImage();
+
+  const showCroppedImage = async () => {
+    if (mainImage && croppedAreaPixels) {
+      const croppedImage = await getCroppedImage(mainImage, croppedAreaPixels);
+      setCroppedImage(croppedImage);
+
+      URL.revokeObjectURL(mainImage);
+    }
+    handleClose();
+  };
+
   return (
     <Drawer open={isOpen} onOpenChange={handleClose}>
       <DrawerContent className="flex h-full w-full border-none bg-black">
@@ -123,8 +136,8 @@ export default function ImageCropDrawer({
           files={files}
           setFiles={setFiles}
         />
-        <DrawerFooter className="z-50">
-          <Button>Submit</Button>
+        <DrawerFooter className="bottom-0 z-50">
+          <Button onClick={showCroppedImage}>Submit</Button>
           <DrawerClose onClick={() => onClose()} asChild>
             <Button variant="outline">Cancel</Button>
           </DrawerClose>
