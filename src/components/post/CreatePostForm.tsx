@@ -43,7 +43,6 @@ const ImagePreview = ({ file }: { file: File }) => {
   const [src, setSrc] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    console.log("called");
     setSrc(URL.createObjectURL(file));
 
     return () => {
@@ -160,7 +159,7 @@ export default function CreatePostForm() {
           {croppedImage && (
             <div className="flex h-full w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600">
               {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
-              <img src={croppedImage} width={200} height={350} />
+              <img src={croppedImage} className="object-contain" />
             </div>
           )}
 

@@ -34,17 +34,6 @@ const ImageCropper = ({ src, files, setFiles }: ImageCropperProps) => {
     [setCroppedAreaPixels],
   );
 
-  // const showCroppedImage = useCallback(async () => {
-  //   try {
-  //     if (croppedAreaPixels) {
-  //       const croppedImage = await getCroppedImage(src, croppedAreaPixels);
-  //       setCroppedImage(croppedImage);
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }, [croppedAreaPixels, src, setCroppedImage]);
-
   return (
     <Cropper
       image={src}
