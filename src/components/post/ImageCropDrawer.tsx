@@ -53,14 +53,14 @@ const MyDrawerContent = () => {
 };
 
 export default function ImageCropDrawer() {
-  const { currentImage, setCurrenImage, addImage } = useImage();
+  const { currentImage, setCurrentImage, addImage } = useImage();
   const { croppedAreaPixels } = useCroppedImage();
   const { onClose, isOpen } = useDrawer();
 
   const handleClose = () => {
     if (currentImage) {
       URL.revokeObjectURL(currentImage);
-      setCurrenImage(undefined);
+      setCurrentImage(undefined);
     }
     onClose();
   };

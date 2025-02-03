@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useDrawer, useImage } from "@/common/store";
+import { Trash2Icon } from "lucide-react";
 import { IoAddSharp } from "react-icons/io5";
 import ImageCropDrawer from "./ImageCropDrawer";
 
@@ -38,7 +39,7 @@ const formSchema = z.object({
 });
 
 export default function CreatePostForm() {
-  const { images, setCurrenImage, currentImage } = useImage();
+  const { images, setCurrentImage, currentImage, removeImage } = useImage();
   const { onOpen } = useDrawer();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -80,7 +81,7 @@ export default function CreatePostForm() {
           const newImage = e.target.files?.item(0);
           if (newImage) {
             const imageSrc = URL.createObjectURL(newImage);
-            setCurrenImage(imageSrc ?? undefined);
+            setCurrentImage(imageSrc ?? undefined);
             e.target.value = "";
             onOpen();
           }
@@ -95,8 +96,17 @@ export default function CreatePostForm() {
           {images.map(({ id, src }) => (
             <div
               key={id}
-              className="flex h-full min-w-[200px] max-w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600"
+              className="relative flex h-full min-w-[200px] max-w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600"
             >
+              <button
+                className="absolute right-0 top-0 p-2"
+                onClick={() => {
+                  removeImage(id);
+                  URL.revokeObjectURL(src);
+                }}
+              >
+                <Trash2Icon className="text-red-600 hover:text-red-400" />
+              </button>
               {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
               <img src={src} className="object-contain" />
             </div>
@@ -147,121 +157,3 @@ export default function CreatePostForm() {
     </form>
   );
 }
-
-// <Form {...form}>
-// <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-//   <FormField
-//     control={form.control}
-//     name="caption"
-//     render={({ field }) => (
-//       <FormItem>
-//         <FormLabel>Caption</FormLabel>
-//         <FormControl>
-//           <Input
-//             placeholder="caption"
-//             {...field}
-//             className="border-gray-600"
-//           />
-//         </FormControl>
-//         <FormDescription>
-//           This is your caption for your post.
-//         </FormDescription>
-//         <FormMessage />
-//       </FormItem>
-//     )}
-//   />
-
-//   <FormField
-//     control={form.control}
-//     name="media"
-//     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//     render={({ field: { value, onChange, ...fieldProps } }) => (
-//       <FormItem>
-//         <FormLabel>Media</FormLabel>
-//         <FormControl>
-//           <Input
-//             className="hidden"
-//             id="file"
-//             placeholder="media"
-//             {...fieldProps}
-//             type="file"
-//             accept="images/*"
-//             onChange={(e) => {
-//               const newFile = e.target.files?.item(0);
-//               setCurrentFile(newFile ?? undefined);
-//               e.target.value = "";
-//               onOpen();
-//             }}
-//           />
-//         </FormControl>
-
-//         {files && <ImagePreviewList files={files} />}
-
-//         {currentFile && (
-//           <ImageCropDrawer
-//             currentFile={currentFile}
-//             files={files}
-//             setFiles={setFiles}
-//             isOpen={isOpen}
-//             onOpen={onOpen}
-//             onClose={onClose}
-//             setCurrentFile={setCurrentFile}
-//           />
-//         )}
-
-//         <div className="flex h-[350px] w-full items-center gap-x-2 overflow-x-auto rounded-sm border-[1px] border-gray-600 p-2">
-//           <div
-//             className="flex h-full min-w-[200px] items-center justify-center rounded-sm border-[1px] border-dashed border-gray-600"
-//             onClick={() => {
-//               const fileInput = document.getElementById("file");
-//               fileInput?.click();
-//             }}
-//           >
-//             <div className="flex flex-col items-center justify-center gap-y-2">
-//               <IoAddSharp className="h-12 w-12 text-gray-400" />
-//               <span className="text-xs text-gray-400">
-//                 Add your photos here.
-//               </span>
-//             </div>
-//           </div>
-//         </div>
-
-//         <FormDescription>
-//           This is your media for your post.
-//         </FormDescription>
-//         <FormMessage />
-//       </FormItem>
-//     )}
-//   />
-
-//   <FormField
-//     control={form.control}
-//     name="type"
-//     render={({ field }) => (
-//       <FormItem>
-//         <FormLabel>Type</FormLabel>
-//         <FormControl>
-//           <Select onValueChange={field.onChange} value={field.value}>
-//             <SelectTrigger className="w-[180px]">
-//               <SelectValue placeholder="Public" />
-//             </SelectTrigger>
-//             <SelectContent className="bg-black text-gray-400">
-//               <SelectItem value="PUBLIC">Public</SelectItem>
-//               <SelectItem value="PRIVATE">Private</SelectItem>
-//               <SelectItem value="DRAFT">Draft</SelectItem>
-//             </SelectContent>
-//           </Select>
-//         </FormControl>
-//         <FormDescription>
-//           This is your visibility type for your post.
-//         </FormDescription>
-//         <FormMessage />
-//       </FormItem>
-//     )}
-//   />
-
-//   <Button type="submit" className="block">
-//     Submit
-//   </Button>
-// </form>
-// </Form>

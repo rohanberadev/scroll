@@ -6,14 +6,14 @@ import { create } from "zustand";
 type FilesProps = {
   currentImage: string | undefined;
   images: Array<{ id: number; src: string }>;
-  setCurrenImage: (src: string | undefined) => void;
+  setCurrentImage: (src: string | undefined) => void;
   addImage: (src: string) => void;
   removeImage: (id: number) => void;
 };
 export const useImage = create<FilesProps>((set) => ({
   currentImage: undefined,
   images: [],
-  setCurrenImage: (src) => set({ currentImage: src }),
+  setCurrentImage: (src) => set({ currentImage: src }),
   addImage: (src) =>
     set((state) => ({
       images: [...state.images, { id: state.images.length, src }],
