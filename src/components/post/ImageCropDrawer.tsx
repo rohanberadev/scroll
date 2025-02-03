@@ -1,6 +1,6 @@
 "use client";
 
-import { useCroppedImage } from "@/common/store";
+import { useCroppedImage, useDrawer, useImage } from "@/common/store";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -11,18 +11,12 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Cropper, { type Area as CroppedAreaPixels } from "react-easy-crop";
 import getCroppedImage from "./cropImage";
 
-type ImageCropperProps = {
-  src: string;
-  files: File[];
-  setFiles: (file: File) => void;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ImageCropper = ({ src, files, setFiles }: ImageCropperProps) => {
+const ImageCropper = (props: { src: string }) => {
+  const { src } = props;
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const { setCroppedAreaPixels } = useCroppedImage();
@@ -48,67 +42,36 @@ const ImageCropper = ({ src, files, setFiles }: ImageCropperProps) => {
   );
 };
 
-type MyDrawerContentProps = {
-  currentFile: File;
-  files: File[];
-  setFiles: (file: File) => void;
-};
-
-const MyDrawerContent = ({
-  currentFile,
-  files,
-  setFiles,
-}: MyDrawerContentProps) => {
-  // const [src, setSrc] = useState<string | undefined>(undefined);
-  const { setMainImage, mainImage } = useCroppedImage();
-
-  useEffect(() => {
-    setMainImage(URL.createObjectURL(currentFile));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+const MyDrawerContent = () => {
+  const { currentImage } = useImage();
 
   return (
     <div className="absolute left-1/2 top-1/2 h-[500px] w-full -translate-x-1/2 -translate-y-1/2">
-      {mainImage && (
-        <ImageCropper src={mainImage} files={files} setFiles={setFiles} />
-      )}
+      {currentImage && <ImageCropper src={currentImage} />}
     </div>
   );
 };
 
-type ImageCropDrawer = {
-  isOpen: boolean;
-  onOpen: () => void;
-  onClose: () => void;
-  currentFile: File;
-  files: File[];
-  setFiles: (file: File) => void;
-  setCurrentFile: (file: File | undefined) => void;
-};
+export default function ImageCropDrawer() {
+  const { currentImage, setCurrenImage, addImage } = useImage();
+  const { croppedAreaPixels } = useCroppedImage();
+  const { onClose, isOpen } = useDrawer();
 
-export default function ImageCropDrawer({
-  isOpen,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onOpen,
-  onClose,
-  currentFile,
-  files,
-  setFiles,
-  setCurrentFile,
-}: ImageCropDrawer) {
   const handleClose = () => {
-    setCurrentFile(undefined);
+    if (currentImage) {
+      URL.revokeObjectURL(currentImage);
+      setCurrenImage(undefined);
+    }
     onClose();
   };
 
-  const { croppedAreaPixels, mainImage, setCroppedImage } = useCroppedImage();
-
   const showCroppedImage = async () => {
-    if (mainImage && croppedAreaPixels) {
-      const croppedImage = await getCroppedImage(mainImage, croppedAreaPixels);
-      setCroppedImage(croppedImage);
-
-      URL.revokeObjectURL(mainImage);
+    if (currentImage && croppedAreaPixels) {
+      const croppedImage = await getCroppedImage(
+        currentImage,
+        croppedAreaPixels,
+      );
+      addImage(croppedImage!);
     }
     handleClose();
   };
@@ -120,11 +83,7 @@ export default function ImageCropDrawer({
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
           <DrawerDescription>This action cannot be undone.</DrawerDescription>
         </DrawerHeader>
-        <MyDrawerContent
-          currentFile={currentFile}
-          files={files}
-          setFiles={setFiles}
-        />
+        <MyDrawerContent />
         <DrawerFooter className="bottom-0 z-50">
           <Button onClick={showCroppedImage}>Submit</Button>
           <DrawerClose onClick={() => onClose()} asChild>

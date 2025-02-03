@@ -4,16 +4,24 @@ import { type Area as CroppedAreaPixels } from "react-easy-crop";
 import { create } from "zustand";
 
 type FilesProps = {
-  currentFile: File | undefined;
-  files: File[];
-  setCurrentFile: (file: File | undefined) => void;
-  addFiles: (file: File) => void;
+  currentImage: string | undefined;
+  images: Array<{ id: number; src: string }>;
+  setCurrenImage: (src: string | undefined) => void;
+  addImage: (src: string) => void;
+  removeImage: (id: number) => void;
 };
-export const useFiles = create<FilesProps>((set) => ({
-  currentFile: undefined,
-  files: [],
-  setCurrentFile: (file) => set({ currentFile: file }),
-  addFiles: (file) => set((state) => ({ files: [...state.files, file] })),
+export const useImage = create<FilesProps>((set) => ({
+  currentImage: undefined,
+  images: [],
+  setCurrenImage: (src) => set({ currentImage: src }),
+  addImage: (src) =>
+    set((state) => ({
+      images: [...state.images, { id: state.images.length, src }],
+    })),
+  removeImage: (id) =>
+    set((state) => ({
+      images: state.images.filter((image) => image.id !== id),
+    })),
 }));
 
 type DrawerProps = {
@@ -28,17 +36,12 @@ export const useDrawer = create<DrawerProps>((set) => ({
 }));
 
 type CroppedImage = {
-  mainImage: string | undefined;
-  setMainImage: (src: string) => void;
   croppedImage: string | undefined;
   setCroppedImage: (imageSrc: string | undefined) => void;
   croppedAreaPixels: CroppedAreaPixels | null;
   setCroppedAreaPixels: (areaPixels: CroppedAreaPixels) => void;
 };
 export const useCroppedImage = create<CroppedImage>((set) => ({
-  mainImage: undefined,
-  setMainImage: (src: string) => set({ mainImage: src }),
-
   croppedImage: undefined,
   setCroppedImage: (imageSrc: string | undefined) =>
     set({ croppedImage: imageSrc }),

@@ -14,12 +14,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useCroppedImage, useDrawer, useFiles } from "@/common/store";
-import { useEffect, useState } from "react";
+import { useDrawer, useImage } from "@/common/store";
 import { IoAddSharp } from "react-icons/io5";
 import ImageCropDrawer from "./ImageCropDrawer";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formSchema = z.object({
   caption: z
     .string()
@@ -39,54 +37,9 @@ const formSchema = z.object({
   type: z.enum(["DRAFT", "PUBLIC", "PRIVATE"]).default("PUBLIC"),
 });
 
-const ImagePreview = ({ file }: { file: File }) => {
-  const [src, setSrc] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    setSrc(URL.createObjectURL(file));
-
-    return () => {
-      if (src) {
-        URL.revokeObjectURL(src);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (src) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        alt="Preview"
-        className="select-none object-cover"
-        width={200}
-        height={350}
-      />
-    );
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ImagePreviewList = ({ files }: { files: File[] }) => {
-  return files.map((file, index) => <ImagePreview file={file} key={index} />);
-};
-
 export default function CreatePostForm() {
-  const { files, addFiles, currentFile, setCurrentFile } = useFiles();
-  const { isOpen, onOpen, onClose } = useDrawer();
-  const { croppedImage } = useCroppedImage();
-
-  console.log(croppedImage);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const convertArrayToFileList = (filesArray: File[]) => {
-    const dataTransfer = new DataTransfer();
-    filesArray.forEach((file) => {
-      dataTransfer.items.add(file);
-    });
-    return dataTransfer.files; // returns a FileList
-  };
+  const { images, setCurrenImage, currentImage } = useImage();
+  const { onOpen } = useDrawer();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,11 +50,6 @@ export default function CreatePostForm() {
   });
 
   const onSubmit = async () => {
-    // type FormData = z.infer<typeof createPostFormSchema>;
-    // const formData: FormData = {
-    //   caption: form.getValues().caption,
-    //   media: convertArrayToFileList(files),
-    // };
     console.log(form.getValues);
   };
 
@@ -129,9 +77,10 @@ export default function CreatePostForm() {
         type="file"
         accept="images/*"
         onChange={(e) => {
-          const newFile = e.target.files?.item(0);
-          if (newFile) {
-            setCurrentFile(newFile ?? undefined);
+          const newImage = e.target.files?.item(0);
+          if (newImage) {
+            const imageSrc = URL.createObjectURL(newImage);
+            setCurrenImage(imageSrc ?? undefined);
             // addFiles(newFile);
             e.target.value = "";
             onOpen();
@@ -139,29 +88,20 @@ export default function CreatePostForm() {
         }}
       />
 
-      {currentFile && (
-        <ImageCropDrawer
-          currentFile={currentFile}
-          files={files}
-          setFiles={addFiles}
-          isOpen={isOpen}
-          onOpen={onOpen}
-          onClose={onClose}
-          setCurrentFile={setCurrentFile}
-        />
-      )}
+      {currentImage && <ImageCropDrawer />}
 
       <div className="mb-8">
         <label className="ml-1 text-sm text-gray-400">Media</label>
         <div className="mt-1 flex h-[350px] w-full items-center gap-x-4 overflow-x-auto rounded-sm border-[1px] border-gray-600 p-2">
-          {/* {files && <ImagePreviewList files={files} />} */}
-
-          {croppedImage && (
-            <div className="flex h-full w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600">
+          {images.map(({ id, src }) => (
+            <div
+              key={id}
+              className="flex h-full w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600"
+            >
               {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
-              <img src={croppedImage} className="object-contain" />
+              <img src={src} className="object-contain" />
             </div>
-          )}
+          ))}
 
           <div
             className="flex h-full min-w-[200px] cursor-pointer items-center justify-center rounded-sm border-[1px] border-dashed border-gray-600"
