@@ -1,5 +1,5 @@
 import { BsBookmark } from "react-icons/bs";
 
 export default function SaveButton() {
-  return <BsBookmark className="h-5 w-5" />;
+  return <BsBookmark className="h-5 w-5 cursor-pointer" />;
 }

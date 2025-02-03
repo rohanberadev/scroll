@@ -81,7 +81,6 @@ export default function CreatePostForm() {
           if (newImage) {
             const imageSrc = URL.createObjectURL(newImage);
             setCurrenImage(imageSrc ?? undefined);
-            // addFiles(newFile);
             e.target.value = "";
             onOpen();
           }
@@ -92,11 +91,11 @@ export default function CreatePostForm() {
 
       <div className="mb-8">
         <label className="ml-1 text-sm text-gray-400">Media</label>
-        <div className="mt-1 flex h-[350px] w-full items-center gap-x-4 overflow-x-auto rounded-sm border-[1px] border-gray-600 p-2">
+        <div className="mt-1 flex h-[350px] w-full select-none items-center gap-x-4 overflow-x-auto rounded-sm border-[1px] border-gray-600 p-2">
           {images.map(({ id, src }) => (
             <div
               key={id}
-              className="flex h-full w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600"
+              className="flex h-full min-w-[200px] max-w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600"
             >
               {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
               <img src={src} className="object-contain" />
