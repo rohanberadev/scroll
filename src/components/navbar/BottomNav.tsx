@@ -6,14 +6,14 @@ import { usePathname } from "next/navigation";
 import NavLink from "@/components/navbar/NavLink";
 import Avatar from "@/components/user/Avatar";
 
-import { GoHome } from "react-icons/go";
-import { GoHomeFill } from "react-icons/go";
-import { RiSearchLine } from "react-icons/ri";
-import { RiSearchFill } from "react-icons/ri";
-import { MdOutlineExplore } from "react-icons/md";
-import { MdExplore } from "react-icons/md";
-import { MdOutlineAddToPhotos } from "react-icons/md";
-import { MdAddToPhotos } from "react-icons/md";
+import { GoHome, GoHomeFill } from "react-icons/go";
+import {
+  MdAddToPhotos,
+  MdExplore,
+  MdOutlineAddToPhotos,
+  MdOutlineExplore,
+} from "react-icons/md";
+import { RiSearchFill, RiSearchLine } from "react-icons/ri";
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -62,11 +62,11 @@ export default function BottomNav() {
         </li>
 
         <li>
-          <Link href={"/profile"}>
+          <Link href={"/profile/me"}>
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
-              active={pathname === "/profile"}
+              active={pathname === "/profile/me"}
             />
           </Link>
         </li>

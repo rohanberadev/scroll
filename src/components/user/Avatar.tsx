@@ -1,7 +1,7 @@
 import {
-  Avatar as AvatarLib,
   AvatarFallback,
   AvatarImage,
+  Avatar as AvatarLib,
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ export default function Avatar({
     <AvatarLib className={avatarContainerStyles}>
       <AvatarImage
         src="https://github.com/shadcn.png"
-        className={cn("select-none", avatarImageStyles)}
+        className={cn("block select-none", avatarImageStyles)}
       />
       <AvatarFallback className={avatarFallbackStyles}>CN</AvatarFallback>
       {AvatarLabel}

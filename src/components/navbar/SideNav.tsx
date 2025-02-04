@@ -6,18 +6,15 @@ import { usePathname } from "next/navigation";
 import NavLink from "@/components/navbar/NavLink";
 import Avatar from "@/components/user/Avatar";
 
-import { GoHome } from "react-icons/go";
-import { GoHomeFill } from "react-icons/go";
-import { RiSearchLine } from "react-icons/ri";
-import { RiSearchFill } from "react-icons/ri";
-import { MdOutlineExplore } from "react-icons/md";
-import { MdExplore } from "react-icons/md";
-import { AiOutlineMessage } from "react-icons/ai";
-import { AiFillMessage } from "react-icons/ai";
-import { GoHeart } from "react-icons/go";
-import { GoHeartFill } from "react-icons/go";
-import { MdOutlineAddToPhotos } from "react-icons/md";
-import { MdAddToPhotos } from "react-icons/md";
+import { AiFillMessage, AiOutlineMessage } from "react-icons/ai";
+import { GoHeart, GoHeartFill, GoHome, GoHomeFill } from "react-icons/go";
+import {
+  MdAddToPhotos,
+  MdExplore,
+  MdOutlineAddToPhotos,
+  MdOutlineExplore,
+} from "react-icons/md";
+import { RiSearchFill, RiSearchLine } from "react-icons/ri";
 
 export default function SideNav() {
   const pathname = usePathname();
@@ -85,12 +82,12 @@ export default function SideNav() {
           />
         </li>
         <li>
-          <Link href={"/profile"}>
+          <Link href={"/profile/me"}>
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
               AvatarLabel={<span className="text-[1rem]">Profile</span>}
-              active={pathname === "/profile"}
+              active={pathname === "/profile/me"}
             />
           </Link>
         </li>

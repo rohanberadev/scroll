@@ -17,11 +17,6 @@ export default function AppLayout({
         {children}
       </main>
 
-      {/* Main Screen */}
-      {/* <main className="scrollbar flex h-screen flex-col items-center overflow-y-scroll max-lg:h-tab-screen max-lg:w-full max-xs:h-mobile-screen lg:h-screen lg:flex-1 lg:px-8">
-        {children}
-      </main> */}
-
       {/* Mobile Nav */}
       <BottomNav />
     </div>
