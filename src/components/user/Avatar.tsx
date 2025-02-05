@@ -25,7 +25,7 @@ export default function Avatar({
   active,
 }: Props) {
   return (
-    <AvatarLib className={cn(avatarContainerStyles)}>
+    <AvatarLib className={avatarContainerStyles}>
       <AvatarImage
         src="https://github.com/shadcn.png"
         className={cn(
