@@ -221,6 +221,16 @@ model CommentReport {
     @@index([reportedToId])
 }
 
+model Hashtag {
+    id        String   @id @default(cuid())
+    tag       String
+    used      BigInt   @default(0)
+    createdAt DateTime @default(now())
+
+    @@unique([tag])
+    @@index([tag])
+}
+
 // enums
 enum UserRole {
     USER
