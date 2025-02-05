@@ -42,7 +42,7 @@ export default function SideNav() {
             linkLabel="Search"
             FillIcon={RiSearchFill}
             OutlineIcon={RiSearchLine}
-            active={pathname === "/search"}
+            active={pathname.includes("search")}
           />
         </li>
         <li>
@@ -51,7 +51,7 @@ export default function SideNav() {
             linkLabel="Explore"
             FillIcon={MdExplore}
             OutlineIcon={MdOutlineExplore}
-            active={pathname === "/explore"}
+            active={pathname.includes("explore")}
           />
         </li>
         <li>
@@ -60,7 +60,7 @@ export default function SideNav() {
             linkLabel="Messages"
             FillIcon={AiFillMessage}
             OutlineIcon={AiOutlineMessage}
-            active={pathname === "/messages"}
+            active={pathname.includes("messages")}
           />
         </li>
         <li>
@@ -69,7 +69,7 @@ export default function SideNav() {
             linkLabel="Notifications"
             FillIcon={GoHeartFill}
             OutlineIcon={GoHeart}
-            active={pathname === "/notifications"}
+            active={pathname.includes("notifications")}
           />
         </li>
         <li>
