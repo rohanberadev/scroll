@@ -14,15 +14,15 @@ export default function ProfileCard(props: {
     <div className="relative flex w-full items-center gap-x-6 rounded-t-lg border-gray-600 p-6 max-lg:border-b-[1px] lg:border-[1px]">
       <div className="flex flex-col items-center justify-center gap-y-4">
         <Avatar avatarContainerStyles="w-[80px] lg:w-[130px] h-auto rounded-full border-[4px] border-gray-200" />
-        <span className="text-sm lg:text-2xl">Username</span>
+        <span className="text-sm lg:text-xl">Username</span>
       </div>
       <div
         className={cn(
-          "flex w-full flex-col gap-y-4",
+          "flex w-full flex-col gap-y-4 p-6 lg:px-12",
           enableFollowBtn ? "pt-4" : "",
         )}
       >
-        <div className="flex w-full items-center justify-between max-lg:gap-x-6 xs:px-6 sm:px-8 md:px-16 lg:gap-x-12 lg:px-24">
+        <div className="flex w-full items-center justify-between px-8 max-lg:gap-x-6 lg:gap-x-12">
           <Link
             href={
               enableFollowBtn && profileId
@@ -31,7 +31,7 @@ export default function ProfileCard(props: {
             }
             className="flex flex-col items-center justify-center"
           >
-            <h1 className="text-sm md:text-lg lg:text-2xl">Followers</h1>
+            <h1 className="text-sm md:text-lg lg:text-xl">Followers</h1>
             <p className="text-sm md:text-lg lg:text-xl">100</p>
           </Link>
           <Link
@@ -42,7 +42,7 @@ export default function ProfileCard(props: {
             }
             className="flex flex-col items-center justify-center"
           >
-            <h1 className="text-sm md:text-lg lg:text-2xl">Following</h1>
+            <h1 className="text-sm md:text-lg lg:text-xl">Following</h1>
             <p className="text-sm md:text-lg lg:text-xl">39</p>
           </Link>
           <Link
@@ -53,7 +53,7 @@ export default function ProfileCard(props: {
             }
             className="flex flex-col items-center justify-center"
           >
-            <h1 className="text-sm md:text-lg lg:text-2xl">Posts</h1>
+            <h1 className="text-sm md:text-lg lg:text-xl">Posts</h1>
             <p className="text-sm md:text-lg lg:text-xl">90</p>
           </Link>
         </div>
@@ -68,7 +68,7 @@ export default function ProfileCard(props: {
         </Button>
       </div>
 
-      <ProfileInfoButton triggerClassName="absolute top-2 right-2 md:top-4 md:right-4" />
+      <ProfileInfoButton triggerClassName="absolute top-3 right-4 md:top-4 md:right-4" />
     </div>
   );
 }

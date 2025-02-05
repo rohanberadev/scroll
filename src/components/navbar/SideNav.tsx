@@ -84,7 +84,7 @@ export default function SideNav() {
         <li>
           <Link href={"/profile/me"}>
             <Avatar
-              avatarContainerStyles="h-auto w-full items-center gap-x-6"
+              avatarContainerStyles="h-auto w-full items-center gap-x-6 rounded-full"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
               AvatarLabel={<span className="text-[1rem]">Profile</span>}
               active={pathname === "/profile/me"}

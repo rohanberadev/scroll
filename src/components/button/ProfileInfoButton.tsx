@@ -7,11 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-  EllipsisVerticalIcon,
-  LogOutIcon,
-  UserRoundPenIcon,
-} from "lucide-react";
+import { LogOutIcon, SettingsIcon, UserRoundPenIcon } from "lucide-react";
 
 export default function ProfileInfoButton(props: {
   triggerClassName?: string;
@@ -19,7 +15,7 @@ export default function ProfileInfoButton(props: {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={props.triggerClassName}>
-        <EllipsisVerticalIcon />
+        <SettingsIcon className="text-gray-200 max-lg:h-5 max-lg:w-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-black text-gray-200">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>

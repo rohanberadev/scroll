@@ -25,10 +25,14 @@ export default function Avatar({
   active,
 }: Props) {
   return (
-    <AvatarLib className={avatarContainerStyles}>
+    <AvatarLib className={cn(avatarContainerStyles)}>
       <AvatarImage
         src="https://github.com/shadcn.png"
-        className={cn("block select-none", avatarImageStyles)}
+        className={cn(
+          "block select-none",
+          active ? "border-[2px]" : "",
+          avatarImageStyles,
+        )}
       />
       <AvatarFallback className={avatarFallbackStyles}>CN</AvatarFallback>
       {AvatarLabel}
