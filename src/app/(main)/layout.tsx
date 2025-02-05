@@ -13,7 +13,7 @@ export default function AppLayout({
       {/* Desktop Nav */}
       <SideNav />
 
-      <main className="flex w-full flex-col items-center lg:flex-1 lg:px-8 lg:pl-[250px] xl:pl-[325px]">
+      <main className="flex w-full flex-col items-center lg:flex-1 lg:pl-[250px] xl:pl-[325px]">
         {children}
       </main>
 

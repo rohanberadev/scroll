@@ -1,5 +1,3 @@
-"use client";
-
 import ShowPost from "@/components/post/ShowPost";
 
 export default function Home() {
