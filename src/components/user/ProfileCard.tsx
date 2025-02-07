@@ -22,7 +22,7 @@ export default function ProfileCard(props: {
           enableFollowBtn ? "pt-4" : "",
         )}
       >
-        <div className="flex w-full items-center justify-between px-8 max-lg:gap-x-6 lg:gap-x-12">
+        <div className="flex w-full items-center justify-between px-4 max-lg:gap-x-6 max-lg:pt-4 lg:gap-x-12 lg:px-6">
           <Link
             href={
               enableFollowBtn && profileId

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -10,18 +11,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
-import { api } from "@/trpc/react";
 import { signInFormSchema, signUpFormSchema } from "@/common/schema";
+import { api } from "@/trpc/react";
 
-import { type z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { ClipLoader } from "react-spinners";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { ClipLoader } from "react-spinners";
+import { type z } from "zod";
 
 type Props = {
   formButtonLabel: string;
@@ -73,9 +73,9 @@ function SignInForm({ formButtonLabel }: Props) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="name..." {...field} />
+                <Input placeholder="username..." {...field} />
               </FormControl>
               <FormDescription>This is your public username.</FormDescription>
               <FormMessage />

@@ -39,7 +39,6 @@ model User {
     CommentReport       CommentReport[]
 
     @@index([name])
-    @@index([email])
 }
 
 model Post {

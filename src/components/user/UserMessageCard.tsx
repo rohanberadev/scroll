@@ -6,7 +6,7 @@ export default function UserMessageCard() {
   const lastMessage = "Rohan: Lastmessage";
 
   return (
-    <div className="mb-6 flex h-[100px] w-full items-center rounded-md border-[1px] border-gray-600 p-2">
+    <div className="mb-6 flex h-[100px] w-full items-center rounded-md border-[1px] border-gray-800 p-2">
       <div className="flex items-center gap-x-4">
         <Link href={"/messages/id"} className="relative">
           <Avatar avatarContainerStyles="w-14 h-14" />

@@ -1,13 +1,19 @@
+import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(pathname);
-  if (pathname === "/profile") {
-    return NextResponse.redirect(new URL("/profile/me", request.url));
-  }
+
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+  });
+
+  console.log(token);
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: "/profile",
+  matcher: "/profile/:path",
 };
