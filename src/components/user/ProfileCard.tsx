@@ -68,7 +68,9 @@ export default function ProfileCard(props: {
         </Button>
       </div>
 
-      <ProfileInfoButton triggerClassName="absolute top-3 right-4 md:top-4 md:right-4" />
+      {!enableFollowBtn && (
+        <ProfileInfoButton triggerClassName="absolute top-3 right-4 md:top-4 md:right-4" />
+      )}
     </div>
   );
 }

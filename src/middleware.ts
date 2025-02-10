@@ -1,19 +1,37 @@
-import { getToken } from "next-auth/jwt";
-import { NextResponse, type NextRequest } from "next/server";
+import { authConfig } from "@/server/auth/config";
+import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+const apiPrefix = "/api";
+const authRoutes = ["/sign-in", "/sign-up"];
+const loginUrl = "/sign-in";
+const redirectUrl = "/";
 
-  const token = await getToken({
-    req: request,
-    secret: process.env.AUTH_SECRET,
-  });
+const { auth } = NextAuth(authConfig);
+export default auth(async function middleware(request) {
+  const pathname = request.nextUrl.pathname;
 
-  console.log(token);
+  const isAuthenticated = request.auth;
+  const isAuthRoute = pathname === "/" ? false : authRoutes.includes(pathname);
+  const isProtectedRoute =
+    !authRoutes.includes(pathname) && !pathname.startsWith(apiPrefix);
+
+  if (isAuthRoute && isAuthenticated) {
+    return NextResponse.redirect(new URL(redirectUrl, request.nextUrl));
+  }
+
+  if (isProtectedRoute && !isAuthenticated) {
+    return NextResponse.redirect(new URL(loginUrl, request.nextUrl));
+  }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: "/profile/:path",
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

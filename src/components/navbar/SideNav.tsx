@@ -16,8 +16,9 @@ import {
 } from "react-icons/md";
 import { RiSearchFill, RiSearchLine } from "react-icons/ri";
 
-export default function SideNav() {
+export default function SideNav(props: { username: string }) {
   const pathname = usePathname();
+  const { username } = props;
 
   return (
     <nav className="fixed left-0 top-0 h-screen border-r-[1px] border-gray-600 pl-8 pt-12 max-lg:hidden lg:w-[250px] xl:w-[325px]">
@@ -80,12 +81,12 @@ export default function SideNav() {
           />
         </li>
         <li>
-          <Link href={"/profile/me"}>
+          <Link href={`/profile/${username}`}>
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6 rounded-full"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
               AvatarLabel={<span className="text-[1rem]">Profile</span>}
-              active={pathname === "/profile/me"}
+              active={pathname.includes(username)}
             />
           </Link>
         </li>

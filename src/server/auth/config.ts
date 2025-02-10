@@ -1,10 +1,12 @@
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-
-import { env } from "@/env";
 import { signInFormSchema } from "@/common/schema";
-import { db } from "@/server/db";
-import bcrypt from "bcrypt";
+import { env } from "@/env";
+import bcrypt from "bcryptjs";
+import { DefaultSession, type NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { db } from "../db";
+
+const ACCESS_TOKEN_TTL = env.ACCESS_TOKEN_TTL;
+const REFRESH_TOKEN_TTL = env.REFRESH_TOKEN_TTL;
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -19,13 +21,22 @@ declare module "next-auth" {
       name: string;
       email: string;
       role: "USER" | "ADMIN" | "BANNED";
+      accessToken: string;
+      refreshToken: string;
     } & DefaultSession["user"];
   }
 
   // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
+  //   role: "USER" | "ADMIN" | "BANNED";
   // }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken: string;
+    refreshToken: string;
+    accessTokenExpires: number;
+  }
 }
 
 /**
@@ -35,7 +46,7 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    CredentialsProvider({
+    Credentials({
       name: "Credentials",
       credentials: {
         name: { label: "Username", type: "text", placeholder: "username..." },
@@ -43,15 +54,16 @@ export const authConfig = {
       },
 
       async authorize(credentials) {
-        const creds = await signInFormSchema.safeParseAsync(credentials);
+        const safeCredentials =
+          await signInFormSchema.safeParseAsync(credentials);
 
-        if (!creds.success) {
+        if (!safeCredentials.success) {
           return null;
         }
 
-        const { name, password } = creds.data;
+        const { name, password } = safeCredentials.data;
 
-        const user = await db.user.findFirst({
+        const user = await db.user.findUnique({
           where: {
             name,
           },
@@ -80,16 +92,16 @@ export const authConfig = {
     }),
   ],
   secret: env.AUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    jwt: async ({ token, user }) => {
+      return token;
+    },
+
+    session: async ({ session, token }) => {
+      return {
+        ...session,
+        token,
+      };
+    },
   },
 } satisfies NextAuthConfig;

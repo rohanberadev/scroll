@@ -1,6 +1,15 @@
 import ShowPost from "@/components/post/ShowPost";
+import { auth } from "@/server/auth";
 
-export default function Home() {
+export default async function Home() {
+  // const users = await api.user
+  //   .getUser()
+  //   .catch((error: Error) => redirect("/sign-in"));
+
+  const session = await auth();
+
+  return <>{JSON.stringify(session)}</>;
+
   const posts = Array.from({ length: 2 }, (_, i) => `${i + 1}`);
 
   return (

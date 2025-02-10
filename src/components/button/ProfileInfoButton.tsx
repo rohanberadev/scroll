@@ -6,6 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { signOut } from "@/server/auth";
 
 import { LogOutIcon, SettingsIcon, UserRoundPenIcon } from "lucide-react";
 
@@ -26,7 +27,14 @@ export default function ProfileInfoButton(props: {
         </DropdownMenuItem>
         <DropdownMenuItem className="text-sm text-red-600">
           <LogOutIcon />
-          <span>Sign Out</span>
+          <form
+            action={async () => {
+              "use server";
+              await signOut();
+            }}
+          >
+            <button type="submit">Sign Out</button>
+          </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

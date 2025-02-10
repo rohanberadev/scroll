@@ -6,7 +6,7 @@ export const signUpFormSchema = z.object({
     .toLowerCase()
     .min(3, { message: "Name must contain at least 3 character(s)" })
     .max(20, { message: "Name must contain at most 20 character(s)" })
-    .refine((value) => !/[@#$%^&*()=+!:;'",/?`]/.test(value), {
+    .refine((value) => !/[@#$%^&*()=+!:;'",/?\s``]/.test(value), {
       message: "Username contains disallowed characters",
     }),
   password: z
@@ -25,7 +25,7 @@ export const signInFormSchema = z.object({
     .toLowerCase()
     .min(3, { message: "Name must contain at least 3 character(s)" })
     .max(20, { message: "Name must contain at most 20 character(s)" })
-    .refine((value) => !/[@#$%^&*()=+!:;'",/?`]/.test(value), {
+    .refine((value) => !/[@#$%^&*()=+!:;'",/?\s`]/.test(value), {
       message: "Username contains disallowed characters",
     }),
   password: z

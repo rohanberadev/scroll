@@ -14,10 +14,10 @@ import { Input } from "@/components/ui/input";
 
 import { signInFormSchema, signUpFormSchema } from "@/common/schema";
 import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ClipLoader } from "react-spinners";
@@ -90,7 +90,7 @@ function SignInForm({ formButtonLabel }: Props) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="password..." {...field} />
+                <Input type="password" placeholder="password..." {...field} />
               </FormControl>
               <FormDescription>
                 This is your password for your account.
@@ -119,6 +119,7 @@ function SignUpForm({ formButtonLabel }: Props) {
   const [error, setError] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [success, setSuccess] = useState("");
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
@@ -140,6 +141,7 @@ function SignUpForm({ formButtonLabel }: Props) {
       setLoading(false);
       setSuccess(opts.success);
       form.reset();
+      router.push("/sign-in");
     },
 
     onError(opts) {
@@ -199,7 +201,7 @@ function SignUpForm({ formButtonLabel }: Props) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="password..." {...field} />
+                <Input type="password" placeholder="password..." {...field} />
               </FormControl>
               <FormDescription>
                 This is your password for your account.

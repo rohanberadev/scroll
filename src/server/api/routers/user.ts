@@ -1,9 +1,12 @@
 import { signUpFormSchema } from "@/common/schema";
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 
 import { TRPCError } from "@trpc/server";
-import bcrypt from "bcrypt";
-import { redirect } from "next/navigation";
+import bcrypt from "bcryptjs";
 
 export const userRouter = createTRPCRouter({
   create: publicProcedure.input(signUpFormSchema).mutation(async function ({
@@ -45,6 +48,10 @@ export const userRouter = createTRPCRouter({
       },
     });
 
-    return redirect("/sign-in");
+    return { success: "User is created." };
+  }),
+
+  getUser: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.user.findMany();
   }),
 });

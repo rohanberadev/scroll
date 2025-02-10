@@ -15,8 +15,9 @@ import {
 } from "react-icons/md";
 import { RiSearchFill, RiSearchLine } from "react-icons/ri";
 
-export default function BottomNav() {
+export default function BottomNav(props: { username: string }) {
   const pathname = usePathname();
+  const { username } = props;
 
   return (
     <nav className="fixed bottom-0 left-0 z-50 h-12 w-full border-t-[1px] border-gray-600 bg-black py-2 shadow-lg lg:hidden">
@@ -62,11 +63,11 @@ export default function BottomNav() {
         </li>
 
         <li>
-          <Link href={"/profile/me"}>
+          <Link href={`/profile/${username}`}>
             <Avatar
               avatarContainerStyles="h-auto w-full items-center gap-x-6"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
-              active={pathname === "/profile/me"}
+              active={pathname.includes(username)}
             />
           </Link>
         </li>
