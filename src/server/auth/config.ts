@@ -1,12 +1,9 @@
 import { signInFormSchema } from "@/common/schema";
 import { env } from "@/env";
+import { db } from "@/server/db";
 import bcrypt from "bcryptjs";
-import { DefaultSession, type NextAuthConfig } from "next-auth";
+import type { DefaultSession, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { db } from "../db";
-
-const ACCESS_TOKEN_TTL = env.ACCESS_TOKEN_TTL;
-const REFRESH_TOKEN_TTL = env.REFRESH_TOKEN_TTL;
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

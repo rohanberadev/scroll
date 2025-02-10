@@ -15,6 +15,11 @@ export const env = createEnv({
       .default("development"),
     REFRESH_TOKEN_TTL: z.number(),
     ACCESS_TOKEN_TTL: z.number(),
+    QSTASH_URL: z.string().url(),
+    QSTASH_TOKEN: z.string(),
+    QSTASH_CURRENT_SIGNING_KEY: z.string(),
+    QSTASH_NEXT_SIGNING_KEY: z.string(),
+    NEXT_APP_URL: z.string().url(),
   },
 
   /**
@@ -37,6 +42,11 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     REFRESH_TOKEN_TTL: Number(process.env.REFRESH_TOKEN_TTL),
     ACCESS_TOKEN_TTL: Number(process.env.ACCESS_TOKEN_TTL),
+    QSTASH_URL: process.env.QSTASH_URL,
+    QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+    QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+    QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+    NEXT_APP_URL: process.env.NEXT_APP_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

@@ -1,12 +1,15 @@
 import { signUpFormSchema } from "@/common/schema";
+import { env } from "@/env";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-
 import { TRPCError } from "@trpc/server";
+import { Client } from "@upstash/qstash";
 import bcrypt from "bcryptjs";
+
+const client = new Client({ token: env.QSTASH_TOKEN });
 
 export const userRouter = createTRPCRouter({
   create: publicProcedure.input(signUpFormSchema).mutation(async function ({
@@ -48,7 +51,17 @@ export const userRouter = createTRPCRouter({
       },
     });
 
-    return { success: "User is created." };
+    const sendEmailJob = await client.publishJSON({
+      url: `${env.NEXT_APP_URL}/api/jobs/user-verify-email`,
+      body: { jobId: "123" },
+    });
+
+    console.log(sendEmailJob.messageId);
+
+    return {
+      success: "User is created.",
+      qstashMessageId: sendEmailJob.messageId,
+    };
   }),
 
   getUser: protectedProcedure.query(async ({ ctx }) => {
