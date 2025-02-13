@@ -1,8 +1,9 @@
 import { signInFormSchema } from "@/common/schema";
 import { env } from "@/env";
 import { db } from "@/server/db";
+import { sendEmailVerification } from "@/server/jobs/send-email";
 import bcrypt from "bcryptjs";
-import type { DefaultSession, NextAuthConfig } from "next-auth";
+import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 /**
@@ -18,23 +19,24 @@ declare module "next-auth" {
       name: string;
       email: string;
       role: "USER" | "ADMIN" | "BANNED";
-      accessToken: string;
-      refreshToken: string;
+      // accessToken: string;
+      // refreshToken: string;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   role: "USER" | "ADMIN" | "BANNED";
-  // }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    accessToken: string;
-    refreshToken: string;
-    accessTokenExpires: number;
+  interface User {
+    error?: string;
+    role: "USER" | "ADMIN" | "BANNED";
   }
 }
+
+// declare module "next-auth/jwt" {
+//   interface JWT {
+//     accessToken: string;
+//     refreshToken: string;
+//     accessTokenExpires: number;
+//   }
+// }
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -55,7 +57,7 @@ export const authConfig = {
           await signInFormSchema.safeParseAsync(credentials);
 
         if (!safeCredentials.success) {
-          return null;
+          throw new Error("Invalid input. Please check your credentials.");
         }
 
         const { name, password } = safeCredentials.data;
@@ -70,14 +72,46 @@ export const authConfig = {
             password: true,
             email: true,
             role: true,
+            emailVerified: true,
           },
         });
 
-        if (!user) return null;
+        if (!user) {
+          throw new Error("Invalid username or password.");
+        }
 
-        const matchPassword = await bcrypt.compare(password, user.password);
+        const matchPassword = await bcrypt
+          .compare(password, user.password)
+          .catch((error) => {
+            console.error(
+              "Error authenticating user while comparing passwords:",
+              error,
+            );
+            throw new Error("Authentication failed. Please try again.");
+          });
 
-        if (!matchPassword) return null;
+        if (!matchPassword) {
+          throw new Error("Invalid username or password.");
+        }
+
+        if (!user.emailVerified || user.emailVerified < new Date()) {
+          await sendEmailVerification({
+            userId: user.id,
+            email: user.email,
+            username: user.name,
+          }).catch((error) => {
+            console.error(
+              "Error authenticating user while sending email verification job:",
+              error,
+            );
+            throw new Error(
+              "Unable to send verification email. Please try again later.",
+            );
+          });
+          throw new Error(
+            "Email not verified. A verification email has been sent to your inbox.",
+          );
+        }
 
         return {
           id: user.id,
@@ -90,7 +124,7 @@ export const authConfig = {
   ],
   secret: env.AUTH_SECRET,
   callbacks: {
-    jwt: async ({ token, user }) => {
+    jwt: async ({ token }) => {
       return token;
     },
 

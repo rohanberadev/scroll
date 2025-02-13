@@ -20,6 +20,8 @@ export const env = createEnv({
     QSTASH_CURRENT_SIGNING_KEY: z.string(),
     QSTASH_NEXT_SIGNING_KEY: z.string(),
     NEXT_APP_URL: z.string().url(),
+    RESEND_API_KEY: z.string(),
+    EMAIL_VERIFICATION_TOKEN_TTL: z.number(),
   },
 
   /**
@@ -47,6 +49,10 @@ export const env = createEnv({
     QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
     QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
     NEXT_APP_URL: process.env.NEXT_APP_URL,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_VERIFICATION_TOKEN_TTL: Number(
+      process.env.EMAIL_VERIFICATION_TOKEN_TTL,
+    ),
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

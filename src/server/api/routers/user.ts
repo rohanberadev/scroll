@@ -1,15 +1,13 @@
 import { signUpFormSchema } from "@/common/schema";
-import { env } from "@/env";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
+import { sendEmailVerification } from "@/server/jobs/send-email";
 import { TRPCError } from "@trpc/server";
-import { Client } from "@upstash/qstash";
 import bcrypt from "bcryptjs";
-
-const client = new Client({ token: env.QSTASH_TOKEN });
+import { z } from "zod";
 
 export const userRouter = createTRPCRouter({
   create: publicProcedure.input(signUpFormSchema).mutation(async function ({
@@ -25,46 +23,110 @@ export const userRouter = createTRPCRouter({
 
     if (userByEmail) {
       throw new TRPCError({
-        code: "BAD_REQUEST",
+        code: "CONFLICT",
         message: "Email has been already use!",
       });
     }
 
     if (userByName) {
       throw new TRPCError({
-        code: "BAD_REQUEST",
+        code: "CONFLICT",
         message: "Username is already taken!",
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10).catch((error) => {
-      console.log(error);
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      console.error("Error creating user while hashing password:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
     });
 
-    await ctx.db.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        updatedAt: new Date(),
-      },
-    });
+    const user = await ctx.db.user
+      .create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          updatedAt: new Date(),
+        },
+      })
+      .catch((error) => {
+        console.error("Error creating user while storing user in db:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      });
 
-    const sendEmailJob = await client.publishJSON({
-      url: `${env.NEXT_APP_URL}/api/jobs/user-verify-email`,
-      body: { jobId: "123" },
+    await sendEmailVerification({
+      userId: user.id,
+      username: user.name,
+      email: user.email,
+    }).catch((error) => {
+      console.error("Error creating user while sending email job:", error);
     });
-
-    console.log(sendEmailJob.messageId);
 
     return {
-      success: "User is created.",
-      qstashMessageId: sendEmailJob.messageId,
+      success: "User is created",
     };
   }),
 
   getUser: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.user.findMany();
   }),
+
+  verifyEmail: publicProcedure
+    .input(
+      z.object({
+        token: z.string().uuid(),
+      }),
+    )
+    .query(async function ({ input, ctx }) {
+      const { token } = input;
+
+      const storedToken = await ctx.db.verificationToken
+        .findUnique({
+          where: { token },
+        })
+        .catch((error) => {
+          console.error("Error verifying email:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wront!",
+          });
+        });
+
+      if (!storedToken) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid token!" });
+      }
+
+      if (storedToken.expires < new Date()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Token has been expired!",
+        });
+      }
+
+      try {
+        await Promise.all([
+          ctx.db.verificationToken.delete({ where: { token } }),
+          ctx.db.user.update({
+            where: { id: storedToken.userId },
+            data: {
+              emailVerified: new Date(Date.now() + 60 * 60 * 24 * 365 * 1000),
+            },
+          }),
+        ]);
+
+        return { success: "Email has been successfully verified" };
+      } catch (error) {
+        console.error("Error verifying email:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
+    }),
 });

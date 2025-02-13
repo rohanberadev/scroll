@@ -54,14 +54,16 @@ function SignInForm({ formButtonLabel }: Props) {
       ...formValues,
     });
 
-    if (response?.error) {
+    if (!response) {
+      setError("Something went wrong.");
+    } else if (response.error) {
       setError(response.error);
     } else {
-      form.reset();
-      setSuccess("User is logged in");
+      setSuccess("User is signed in.");
       router.push("/");
     }
 
+    form.reset();
     setLoading(false);
   }
 
@@ -100,7 +102,7 @@ function SignInForm({ formButtonLabel }: Props) {
           )}
         />
 
-        {error && <FormMessage>Invalid Credentials!</FormMessage>}
+        {error && <FormMessage>{error}</FormMessage>}
 
         <Button
           type="submit"

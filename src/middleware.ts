@@ -2,9 +2,10 @@ import { authConfig } from "@/server/auth/config";
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 
+const publicRoutes = ["/verify-email"];
 const apiPrefix = "/api";
 const authRoutes = ["/sign-in", "/sign-up"];
-const loginUrl = "/sign-in";
+const signInUrl = "/sign-in";
 const redirectUrl = "/";
 
 const { auth } = NextAuth(authConfig);
@@ -14,14 +15,16 @@ export default auth(async function middleware(request) {
   const isAuthenticated = request.auth;
   const isAuthRoute = pathname === "/" ? false : authRoutes.includes(pathname);
   const isProtectedRoute =
-    !authRoutes.includes(pathname) && !pathname.startsWith(apiPrefix);
+    !authRoutes.includes(pathname) &&
+    !publicRoutes.includes(pathname) &&
+    !pathname.startsWith(apiPrefix);
 
   if (isAuthRoute && isAuthenticated) {
     return NextResponse.redirect(new URL(redirectUrl, request.nextUrl));
   }
 
   if (isProtectedRoute && !isAuthenticated) {
-    return NextResponse.redirect(new URL(loginUrl, request.nextUrl));
+    return NextResponse.redirect(new URL(signInUrl, request.nextUrl));
   }
 
   return NextResponse.next();
