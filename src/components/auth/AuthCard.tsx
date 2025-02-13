@@ -25,7 +25,7 @@ export default function AuthCard({
   AuthForm,
 }: Props) {
   return (
-    <Card className="flex w-[400px] flex-col rounded-lg border-gray-400 bg-transparent text-gray-100 shadow-md max-lg:h-screen max-lg:w-full max-lg:border-none max-lg:px-4 max-lg:py-12">
+    <Card className="flex w-[400px] flex-col rounded-lg border-gray-400 bg-transparent text-gray-100 shadow-md max-lg:h-screen max-lg:w-full max-lg:border-none max-lg:px-4 max-lg:py-16">
       <CardHeader>
         <CardTitle className="text-start text-4xl">{headerTitle}</CardTitle>
         <CardDescription className="text-start">

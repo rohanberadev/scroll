@@ -53,7 +53,7 @@ export const POST = verifySignatureAppRouter(async (request: NextRequest) => {
 
     return NextResponse.json({ success: data });
   } catch (error) {
-    console.log(error);
+    console.error("Error sending email verification:", error);
     return NextResponse.json({ error }, { status: 500 });
   }
 });

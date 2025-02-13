@@ -15,9 +15,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useDrawer, useImage } from "@/common/store";
+import { env } from "@/env";
+import { IKUpload, ImageKitProvider } from "imagekitio-next";
 import { Trash2Icon } from "lucide-react";
 import { IoAddSharp } from "react-icons/io5";
 import ImageCropDrawer from "./ImageCropDrawer";
+
+const publicKey = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY;
+const urlEndpoint = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT;
 
 const formSchema = z.object({
   caption: z
@@ -37,6 +42,31 @@ const formSchema = z.object({
     ),
   type: z.enum(["DRAFT", "PUBLIC", "PRIVATE"]).default("PUBLIC"),
 });
+
+async function authenticator() {
+  try {
+    const response = await fetch(`${env.NEXT_APP_URL}/api/imagekit-auth`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Request failed with status ${response.status}: ${errorText}`,
+      );
+    }
+
+    const data = (await response.json()) as {
+      signature: string;
+      expire: number;
+      token: string;
+    };
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(`Authentication request failed: ${error.message}`);
+    }
+    throw new Error("An unknown error occurred during authentication.");
+  }
+}
 
 export default function CreatePostForm() {
   const { images, setCurrentImage, currentImage, removeImage } = useImage();
@@ -150,6 +180,14 @@ export default function CreatePostForm() {
           This is your visibility type for your post.
         </p>
       </div>
+
+      <ImageKitProvider
+        publicKey={publicKey}
+        urlEndpoint={urlEndpoint}
+        authenticator={authenticator}
+      >
+        <IKUpload fileName="post.webp" className="hidden" />
+      </ImageKitProvider>
 
       <Button type="submit" className="block">
         Submit

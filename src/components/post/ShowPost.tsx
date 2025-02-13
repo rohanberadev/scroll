@@ -1,5 +1,6 @@
 "use client";
 
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   Card,
   CardContent,
@@ -11,35 +12,38 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  type CarouselApi,
 } from "@/components/ui/carousel";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { type CarouselApi } from "@/components/ui/carousel";
 
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
 
-import Avatar from "@/components/user/Avatar";
-import LikeButton from "@/components/button/LikeButton";
 import CommentButton from "@/components/button/CommentButton";
-import ShareButton from "../button/ShareButton";
+import LikeButton from "@/components/button/LikeButton";
+import Avatar from "@/components/user/Avatar";
+import { env } from "@/env";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import PostInfoButton from "../button/PostInfoButton";
 import SaveButton from "../button/SaveButton";
-import { useEffect, useState } from "react";
+import ShareButton from "../button/ShareButton";
 
-const imageSrc1 =
-  "https://plus.unsplash.com/premium_photo-1675127367513-7f4388aa9076?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bmF0dXJhbHxlbnwwfDF8MHx8fDA%3D";
+// const imageSrc1 =
+//   "https://plus.unsplash.com/premium_photo-1675127367513-7f4388aa9076?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bmF0dXJhbHxlbnwwfDF8MHx8fDA%3D";
 
-const imageSrc2 =
-  "https://plus.unsplash.com/premium_photo-1675433344518-21eb72dfc7a5?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+// const imageSrc2 =
+//   "https://plus.unsplash.com/premium_photo-1675433344518-21eb72dfc7a5?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
-const imageSrc3 =
-  "https://images.pexels.com/photos/1955134/pexels-photo-1955134.jpeg?auto=compress&cs=tinysrgb&w=600";
+// const imageSrc3 =
+//   "https://images.pexels.com/photos/1955134/pexels-photo-1955134.jpeg?auto=compress&cs=tinysrgb&w=600";
 
-const imageSrc4 =
-  "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg";
+// const imageSrc4 =
+//   "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg";
 
-const imageArray = [imageSrc1, imageSrc2, imageSrc3, imageSrc4];
+const urlEndpoint = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT;
+const imageSrc5 = `${env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT}/wallpaper_girl.jpg`;
+
+const imageArray = [imageSrc5];
 
 function PostMedia() {
   const [api, setApi] = useState<CarouselApi>();
@@ -87,11 +91,21 @@ function PostMedia() {
             className="relative select-none pl-[1px] pr-[1px]"
           >
             <AspectRatio ratio={5 / 6}>
-              <Image
+              {/* <Image
                 src={imageUrl}
                 fill
                 alt="image1"
                 className="object-cover"
+              /> */}
+
+              <Image
+                src={imageUrl}
+                placeholder="blur"
+                fill
+                loading="lazy"
+                alt="Alt text"
+                className="object-cover"
+                blurDataURL={`${imageUrl}?tr=w-10,h-10,bl-10`}
               />
             </AspectRatio>
           </CarouselItem>

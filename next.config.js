@@ -8,12 +8,16 @@ import "./src/env.js";
 const config = {
   images: {
     formats: ["image/avif", "image/webp"],
+    domains: ["ik.imagekit.io"],
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "ik.imagekit.io",
+        pathname: "wrqklvdkyj/**",
+        port: "",
       },
     ],
+    // domains: ["ik.imagekit.io"],
   },
 };
 

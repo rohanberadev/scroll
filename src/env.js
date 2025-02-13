@@ -22,6 +22,7 @@ export const env = createEnv({
     NEXT_APP_URL: z.string().url(),
     RESEND_API_KEY: z.string(),
     EMAIL_VERIFICATION_TOKEN_TTL: z.number(),
+    IMAGE_KIT_PRIVATE_KEY: z.string(),
   },
 
   /**
@@ -31,6 +32,8 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT: z.string().url(),
+    NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY: z.string(),
   },
 
   /**
@@ -53,6 +56,11 @@ export const env = createEnv({
     EMAIL_VERIFICATION_TOKEN_TTL: Number(
       process.env.EMAIL_VERIFICATION_TOKEN_TTL,
     ),
+    NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT:
+      process.env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT,
+    NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY:
+      process.env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY,
+    IMAGE_KIT_PRIVATE_KEY: process.env.IMAGE_KIT_PRIVATE_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

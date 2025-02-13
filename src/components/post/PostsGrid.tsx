@@ -1,13 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { useState } from "react";
+import { env } from "@/env";
 import { cn } from "@/lib/utils";
-import { GoHeartFill } from "react-icons/go";
-import { FaComment } from "react-icons/fa";
+import { IKImage } from "imagekitio-next";
 import { motion } from "motion/react";
 import Link from "next/link";
+import { useState } from "react";
+import { FaComment } from "react-icons/fa";
+import { GoHeartFill } from "react-icons/go";
 
 type Props = {
   heightMinusOffset: number;
@@ -30,7 +31,14 @@ function Post({ url }: { url: string }) {
           hover ? "opacity-60" : "",
         )}
       >
-        <Image src={url} fill alt="image" />
+        <IKImage
+          src={url}
+          placeholder="blur"
+          fill
+          alt="image"
+          className="object-cover"
+          blurDataURL={`${url}?tr=w-10,h-10,bl-10`}
+        />
       </AspectRatio>
       <motion.div
         className={cn(
@@ -54,8 +62,7 @@ function Post({ url }: { url: string }) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function PostsGrid({ heightMinusOffset }: Props) {
-  const imageUrl =
-    "https://images.unsplash.com/photo-1517135399940-2855f5be7c4b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bmF0dXJhbHxlbnwwfHwwfHx8MA%3D%3D";
+  const imageUrl = `${env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT}/wallpaper_girl.jpg`;
   const array = Array.from({ length: 15 }, (_, _i) => imageUrl);
 
   return (
