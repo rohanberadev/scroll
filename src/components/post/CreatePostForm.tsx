@@ -16,13 +16,12 @@ import { z } from "zod";
 
 import { useDrawer, useImage } from "@/common/store";
 import { env } from "@/env";
-import { IKUpload, ImageKitProvider } from "imagekitio-next";
 import { Trash2Icon } from "lucide-react";
 import { IoAddSharp } from "react-icons/io5";
 import ImageCropDrawer from "./ImageCropDrawer";
 
 const publicKey = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_KEY;
-const urlEndpoint = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT;
+// const urlEndpoint = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT;
 
 const formSchema = z.object({
   caption: z
@@ -45,7 +44,9 @@ const formSchema = z.object({
 
 async function authenticator() {
   try {
-    const response = await fetch(`${env.NEXT_APP_URL}/api/imagekit-auth`);
+    const response = await fetch(
+      `${env.NEXT_PUBLIC_APP_URL}/api/imagekit-auth`,
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -68,9 +69,51 @@ async function authenticator() {
   }
 }
 
+async function uploadToImageKit(imageSrc: string, isPublished: boolean) {
+  const { signature, expire, token } = await authenticator();
+
+  const url = "https://upload.imagekit.io/api/v1/files/upload";
+
+  const r = await fetch(imageSrc);
+  const blob = await r.blob();
+  const file = new File([blob], "edited-image.webp", { type: blob.type });
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("publicKey", publicKey);
+  formData.append("fileName", "post-image.webp");
+  formData.append("folder", "/post-uploads");
+  formData.append("signature", signature);
+  formData.append("expire", `${expire}`);
+  formData.append("token", token);
+  formData.append("useUniqueFileName", "true");
+  formData.append("isPublished", `${isPublished}`);
+  formData.append("overwriteFile", "true");
+  formData.append("overwriteCustomMetadata", "true");
+  formData.append("checks", "");
+
+  const options = {
+    method: "POST",
+    headers: { Accept: "application/json", Authorization: "Basic 123" },
+    body: formData,
+  };
+
+  try {
+    const response = await fetch(url, options);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const data = await response.json();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return data;
+  } catch (error) {
+    console.error("Upload failed:", error);
+  }
+}
+
 export default function CreatePostForm() {
-  const { images, setCurrentImage, currentImage, removeImage } = useImage();
+  const { images, setCurrentImage, currentImage, removeImage, removeAllImage } =
+    useImage();
   const { onOpen } = useDrawer();
+  // const ikuploadRef = useRef(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -128,17 +171,35 @@ export default function CreatePostForm() {
               key={id}
               className="relative flex h-full min-w-[200px] max-w-[200px] items-center justify-center rounded-sm border-[1px] border-gray-600"
             >
+              {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
+              <img src={src} className="object-contain" />
               <button
                 className="absolute right-0 top-0 p-2"
-                onClick={() => {
+                onClick={async () => {
                   removeImage(id);
                   URL.revokeObjectURL(src);
                 }}
               >
                 <Trash2Icon className="text-red-600 hover:text-red-400" />
+                {/* <Check className="text-green-600 hover:text-green-400" /> */}
               </button>
-              {/* eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element */}
-              <img src={src} className="object-contain" />
+              {/* <ImageKitProvider
+                publicKey={publicKey}
+                urlEndpoint={urlEndpoint}
+                authenticator={authenticator}
+              >
+                <IKUpload
+                  fileName="post.webp"
+                  className="hidden"
+                  onSuccess={onSuccess}
+                  onError={onError}
+                  folder="/posts"
+                  useUniqueFileName={true}
+                  overwriteFile={true}
+                  ref={ikuploadRef}
+                  src={src}
+                />
+              </ImageKitProvider> */}
             </div>
           ))}
 
@@ -181,15 +242,37 @@ export default function CreatePostForm() {
         </p>
       </div>
 
-      <ImageKitProvider
-        publicKey={publicKey}
-        urlEndpoint={urlEndpoint}
-        authenticator={authenticator}
-      >
-        <IKUpload fileName="post.webp" className="hidden" />
-      </ImageKitProvider>
+      <Button
+        type="submit"
+        className="block"
+        onClick={async () => {
+          const results = await Promise.allSettled(
+            images.map((image) => uploadToImageKit(image.src, true)),
+          );
 
-      <Button type="submit" className="block">
+          results.forEach((result, index) => {
+            if (result.status === "fulfilled") {
+              console.log(
+                `✅ Image ${index + 1} uploaded successfully`,
+                result.value,
+              );
+            } else {
+              console.error(
+                `❌ Image ${index + 1} failed to upload`,
+                result.reason,
+              );
+            }
+          });
+
+          images.forEach((image) => {
+            URL.revokeObjectURL(image.src);
+          });
+
+          removeAllImage();
+
+          alert("Images uploaded");
+        }}
+      >
         Submit
       </Button>
     </form>

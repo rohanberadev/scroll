@@ -14,6 +14,8 @@ type Props = {
   heightMinusOffset: number;
 };
 
+const urlEndpoint = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT;
+
 function Post({ url }: { url: string }) {
   const [hover, setHover] = useState(false);
 
@@ -32,7 +34,8 @@ function Post({ url }: { url: string }) {
         )}
       >
         <IKImage
-          src={url}
+          urlEndpoint={urlEndpoint}
+          path="wallpaper_girl.jpg"
           placeholder="blur"
           fill
           alt="image"

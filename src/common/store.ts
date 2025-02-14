@@ -9,6 +9,7 @@ type FilesProps = {
   setCurrentImage: (src: string | undefined) => void;
   addImage: (src: string) => void;
   removeImage: (id: number) => void;
+  removeAllImage: () => void;
 };
 export const useImage = create<FilesProps>((set) => ({
   currentImage: undefined,
@@ -22,6 +23,8 @@ export const useImage = create<FilesProps>((set) => ({
     set((state) => ({
       images: state.images.filter((image) => image.id !== id),
     })),
+
+  removeAllImage: () => set({ images: [] }),
 }));
 
 type DrawerProps = {
