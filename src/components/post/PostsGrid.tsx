@@ -3,8 +3,8 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
-import { IKImage } from "imagekitio-next";
 import { motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { FaComment } from "react-icons/fa";
@@ -13,8 +13,6 @@ import { GoHeartFill } from "react-icons/go";
 type Props = {
   heightMinusOffset: number;
 };
-
-const urlEndpoint = env.NEXT_PUBLIC_IMAGE_KIT_PUBLIC_URL_ENDPOINT;
 
 function Post({ url }: { url: string }) {
   const [hover, setHover] = useState(false);
@@ -33,15 +31,7 @@ function Post({ url }: { url: string }) {
           hover ? "opacity-60" : "",
         )}
       >
-        <IKImage
-          urlEndpoint={urlEndpoint}
-          path="wallpaper_girl.jpg"
-          placeholder="blur"
-          fill
-          alt="image"
-          className="object-cover"
-          blurDataURL={`${url}?tr=w-10,h-10,bl-10`}
-        />
+        <Image src={url} fill alt="image" className="object-cover" />
       </AspectRatio>
       <motion.div
         className={cn(

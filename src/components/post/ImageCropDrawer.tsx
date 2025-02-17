@@ -53,7 +53,7 @@ const MyDrawerContent = () => {
 };
 
 export default function ImageCropDrawer() {
-  const { currentImage, setCurrentImage, addImage } = useImage();
+  const { currentImage, setCurrentImage, addImage, images } = useImage();
   const { croppedAreaPixels } = useCroppedImage();
   const { onClose, isOpen } = useDrawer();
 
@@ -71,7 +71,9 @@ export default function ImageCropDrawer() {
         currentImage,
         croppedAreaPixels,
       );
-      addImage(croppedImage!);
+      if (croppedImage) {
+        addImage(croppedImage);
+      }
     }
     handleClose();
   };

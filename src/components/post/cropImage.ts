@@ -53,7 +53,7 @@ export default async function getCroppedImage(
         if (file) resolve(URL.createObjectURL(file));
         else reject(new Error("Cannot create a image blob!"));
       },
-      "image/webp",
+      "image/jpeg",
       1,
     );
   });

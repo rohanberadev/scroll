@@ -114,17 +114,34 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
-  .use(({ ctx, next }) => {
+  .use(async ({ ctx, next }) => {
     if (!ctx.session || !ctx.session.user) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "User is not authenticated!",
       });
     }
+
+    const storedUser = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+    });
+
+    if (!storedUser) {
+      throw new TRPCError({ code: "CONFLICT", message: "User not found." });
+    }
+
+    if (storedUser.role === "BANNED") {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User is ban from accessing this resource",
+      });
+    }
+
     return next({
       ctx: {
         // infers the `session` as non-nullable
         session: { ...ctx.session, user: ctx.session.user },
+        user: storedUser,
       },
     });
   });

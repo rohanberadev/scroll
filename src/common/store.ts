@@ -5,11 +5,16 @@ import { create } from "zustand";
 
 type FilesProps = {
   currentImage: string | undefined;
-  images: Array<{ id: number; src: string }>;
+  images: Array<{
+    id: number;
+    src: string;
+  }>;
   setCurrentImage: (src: string | undefined) => void;
   addImage: (src: string) => void;
   removeImage: (id: number) => void;
   removeAllImage: () => void;
+  isUploadStart: boolean;
+  setUploadStart: (val: boolean) => void;
 };
 export const useImage = create<FilesProps>((set) => ({
   currentImage: undefined,
@@ -17,7 +22,10 @@ export const useImage = create<FilesProps>((set) => ({
   setCurrentImage: (src) => set({ currentImage: src }),
   addImage: (src) =>
     set((state) => ({
-      images: [...state.images, { id: state.images.length, src }],
+      images: [
+        ...state.images,
+        { id: state.images.length, src, status: "UPLOADING" },
+      ],
     })),
   removeImage: (id) =>
     set((state) => ({
@@ -25,6 +33,8 @@ export const useImage = create<FilesProps>((set) => ({
     })),
 
   removeAllImage: () => set({ images: [] }),
+  isUploadStart: false,
+  setUploadStart: (val) => set({ isUploadStart: val }),
 }));
 
 type DrawerProps = {
