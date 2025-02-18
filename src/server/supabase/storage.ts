@@ -40,6 +40,8 @@ export async function uploadImages(
       }
     });
 
+    console.log("image uploaded");
+
     return { success: uploadedImages };
   } catch (error: unknown) {
     if (error instanceof Error) {

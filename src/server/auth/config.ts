@@ -19,6 +19,7 @@ declare module "next-auth" {
       name: string;
       email: string;
       role: "USER" | "ADMIN" | "BANNED";
+      image: string;
       // accessToken: string;
       // refreshToken: string;
     } & DefaultSession["user"];
@@ -73,6 +74,7 @@ export const authConfig = {
             email: true,
             role: true,
             emailVerified: true,
+            image: true,
           },
         });
 
@@ -118,13 +120,21 @@ export const authConfig = {
           name: user.name,
           email: user.email,
           role: user.role,
+          image: (user.image ? user.image.fullPath : "") as string,
         };
       },
     }),
   ],
   secret: env.AUTH_SECRET,
   callbacks: {
-    jwt: async ({ token }) => {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        return {
+          ...token,
+          image: user.image,
+        };
+      }
+
       return token;
     },
 

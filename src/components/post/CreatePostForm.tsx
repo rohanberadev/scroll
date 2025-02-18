@@ -49,65 +49,96 @@ export default function CreatePostForm(props: { username: string }) {
   async function onSubmit() {
     setFormError(undefined);
 
+    // Validate form inputs
     if (!caption) {
       setFormError({ type: "caption", message: "Caption is required" });
-    } else if (!postType) {
+      return;
+    }
+    if (!postType) {
       setFormError({ type: "postType", message: "Post type is missing" });
-    } else if (images.length === 0) {
+      return;
+    }
+    if (images.length === 0) {
       setFormError({
         type: "images",
         message: "Please select an image for the post",
       });
-    } else if (images.length > 5) {
+      return;
+    }
+    if (images.length > 5) {
       setFormError({
         type: "images",
-        message: "You can atmost upload 5 images per post",
+        message: "You can upload at most 5 images per post",
       });
-    }
-
-    if (formError) {
       return;
     }
 
     setUploadStart(true);
 
-    const results = await uploadImages(
-      images,
-      username,
-      postType as "PUBLIC" | "PRIVATE" | "DRAFT",
-    );
+    try {
+      // Upload images first
+      const results = await uploadImages(
+        images,
+        username,
+        postType as "PUBLIC" | "PRIVATE" | "DRAFT",
+      );
 
-    if (results.error) {
-      setError(results.error);
-    } else {
-      const success = results.success
-        ?.map((r) => r.success)
-        .filter((r) => r !== undefined);
-      const fail = results.success
-        ?.map((r) => r.fail)
-        .filter((r) => r !== undefined);
-
-      if (fail) {
-        // handle try again
+      if (results.error) {
+        setError(results.error);
+        setUploadStart(false);
         return;
       }
 
-      if (success) {
-        await createPost.mutateAsync({
+      const mediaData = results.success
+        ?.map((r) => r.success)
+        .filter((r) => r !== undefined);
+      const failedUploads = results.success
+        ?.map((r) => r.fail)
+        .filter((r) => r !== undefined);
+
+      if (failedUploads && failedUploads.length > 0) {
+        console.error("Some images failed to upload:", failedUploads);
+        setError("Some images failed to upload. Please try again.");
+        setUploadStart(false);
+        return;
+      }
+
+      if (!mediaData || mediaData.length === 0) {
+        setError("No images uploaded successfully.");
+        setUploadStart(false);
+        return;
+      }
+
+      // Create post
+      await createPost
+        .mutateAsync({
           caption,
           postType: postType as "PUBLIC" | "PRIVATE" | "DRAFT",
-          media: success,
+          media: mediaData,
+        })
+        .then(({ success }) => {
+          setSuccess(success);
+        })
+        .catch((error) => {
+          if (error instanceof Error) {
+            setError(error.message ?? "Failed to create post");
+          }
+
+          setError("Failed to create post");
+          return;
         });
-      }
+
+      // Clean up image URLs
+      images.forEach((image) => URL.revokeObjectURL(image.src));
+      removeAllImage();
+      setCaption("");
+      setPostType("PUBLIC");
+    } catch (error) {
+      console.error("Error during post submission:", error);
+      setError("Something went wrong while creating the post.");
+    } finally {
+      setUploadStart(false);
     }
-
-    images.forEach((image) => {
-      URL.revokeObjectURL(image.src);
-    });
-
-    removeAllImage();
-
-    setUploadStart(false);
   }
 
   return (

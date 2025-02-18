@@ -3,6 +3,7 @@ import { auth } from "@/server/auth";
 
 export default async function Home() {
   const session = await auth();
+  console.log(session);
 
   const posts = Array.from({ length: 2 }, (_, i) => `${i + 1}`);
 

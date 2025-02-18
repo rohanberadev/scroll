@@ -122,8 +122,15 @@ export const protectedProcedure = t.procedure
       });
     }
 
-    const storedUser = await ctx.db.user.findUnique({
+    const storedUser = await ctx.db.user.findFirst({
       where: { id: ctx.session.user.id },
+      select: {
+        name: true,
+        id: true,
+        email: true,
+        emailVerified: true,
+        role: true,
+      },
     });
 
     if (!storedUser) {

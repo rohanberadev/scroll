@@ -12,7 +12,7 @@ model User {
     name          String     @unique
     email         String     @unique
     password      String
-    image         String?
+    imageId       String?
     role          UserRole   @default(USER)
     bio           String?
     followers     BigInt     @default(0)
@@ -41,6 +41,7 @@ model User {
     PostReort           PostReort[]
     CommentReport       CommentReport[]
     VerificationToken   VerificationToken[]
+    image               File?               @relation(fields: [imageId], references: [id])
 
     @@index([name])
 }
@@ -78,7 +79,7 @@ model Session {
 
 model Post {
     id         String    @id @default(cuid())
-    mediaUrls  String[]
+    files      File[]
     caption    String?
     hashtags   Hashtag[] @relation("PostHashtage")
     likes      BigInt    @default(0)
@@ -99,6 +100,17 @@ model Post {
     SavedPost SavedPost[]
 
     @@index([postedById])
+}
+
+model File {
+    id        String   @id
+    path      String
+    fullPath  String
+    postId    String?
+    createdAt DateTime @default(now())
+
+    post Post?  @relation(fields: [postId], references: [id])
+    user User[]
 }
 
 model VerificationToken {
