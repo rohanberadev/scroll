@@ -61,7 +61,7 @@ export default function PostsGrid({ heightMinusOffset }: Props) {
   return (
     <div className="grid w-full grid-cols-3">
       {array.map((url, index) => (
-        <Link href={`/posts/${index}`} key={index}>
+        <Link href={`/posts/cm7bm9d4p000qsf5uk6t4if68`} key={index}>
           <Post url={url} />
         </Link>
       ))}

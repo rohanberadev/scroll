@@ -91,7 +91,7 @@ model Post {
     postedAt   DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
 
-    createdBy User        @relation(fields: [postedById], references: [id], onDelete: Cascade)
+    postedBy  User        @relation(fields: [postedById], references: [id], onDelete: Cascade)
     View      View[]
     Like      Like[]
     Comment   Comment[]
@@ -118,7 +118,7 @@ model VerificationToken {
     expires DateTime
     userId  String
 
-    User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([token])
 }
@@ -129,8 +129,8 @@ model View {
     viewedById String
     viewedAt   DateTime @default(now())
 
-    post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-    viewer User @relation(fields: [viewedById], references: [id], onDelete: Cascade)
+    post     Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    viewedBy User @relation(fields: [viewedById], references: [id], onDelete: Cascade)
 
     @@index([postId, viewedById])
 }

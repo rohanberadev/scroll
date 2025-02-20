@@ -40,6 +40,7 @@ export const createPostFormSchema = z.object({
   media: z
     .array(z.object({ id: z.string(), path: z.string(), fullPath: z.string() }))
     .min(1, { message: "Atleast one media url should be there" })
-    .max(5, { message: "Atmost 5 media urls are allowed" }),
+    .max(5, { message: "Atmost 5 media urls are allowed" })
+    .default([]),
   postType: z.enum(["DRAFT", "PUBLIC", "PRIVATE"]),
 });

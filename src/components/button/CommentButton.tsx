@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -8,13 +9,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
 
 import { FaRegComment } from "react-icons/fa";
 
 type Props = {
   className?: string;
-  commentCount?: number;
+  commentCount: bigint;
 };
 
 export default function CommentButton({ className, commentCount }: Props) {

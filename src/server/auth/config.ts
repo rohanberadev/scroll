@@ -1,7 +1,6 @@
 import { signInFormSchema } from "@/common/schema";
 import { env } from "@/env";
 import { db } from "@/server/db";
-import { sendEmailVerification } from "@/server/jobs/send-email";
 import bcrypt from "bcryptjs";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
@@ -20,23 +19,17 @@ declare module "next-auth" {
       email: string;
       role: "USER" | "ADMIN" | "BANNED";
       image: string;
-      // accessToken: string;
-      // refreshToken: string;
+      emailVerified: Date;
     } & DefaultSession["user"];
   }
 
   interface User {
-    error?: string;
     role: "USER" | "ADMIN" | "BANNED";
   }
 }
 
 // declare module "next-auth/jwt" {
-//   interface JWT {
-//     accessToken: string;
-//     refreshToken: string;
-//     accessTokenExpires: number;
-//   }
+//   interface JWT {}
 // }
 
 /**
@@ -96,31 +89,31 @@ export const authConfig = {
           throw new Error("Invalid username or password.");
         }
 
-        if (!user.emailVerified || user.emailVerified < new Date()) {
-          await sendEmailVerification({
-            userId: user.id,
-            email: user.email,
-            username: user.name,
-          }).catch((error) => {
-            console.error(
-              "Error authenticating user while sending email verification job:",
-              error,
-            );
-            throw new Error(
-              "Unable to send verification email. Please try again later.",
-            );
-          });
-          throw new Error(
-            "Email not verified. A verification email has been sent to your inbox.",
-          );
-        }
+        // if (!user.emailVerified || user.emailVerified < new Date()) {
+        //   await sendEmailVerification({
+        //     userId: user.id,
+        //     email: user.email,
+        //     username: user.name,
+        //   }).catch((error) => {
+        //     console.error(
+        //       "Error authenticating user while sending email verification job:",
+        //       error,
+        //     );
+        //     throw new Error(
+        //       "Unable to send verification email. Please try again later.",
+        //     );
+        //   });
+        //   throw new Error(
+        //     "Email not verified. A verification email has been sent to your inbox.",
+        //   );
+        // }
 
         return {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
-          image: (user.image ? user.image.fullPath : "") as string,
+          image: user.image ? user.image.fullPath : "",
         };
       },
     }),
@@ -131,7 +124,11 @@ export const authConfig = {
       if (user) {
         return {
           ...token,
-          image: user.image,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role, // Ensure role is stored
+          image: user.image ?? "", // Ensure image is defined
         };
       }
 
@@ -139,10 +136,17 @@ export const authConfig = {
     },
 
     session: async ({ session, token }) => {
-      return {
-        ...session,
-        token,
-      };
+      if (token) {
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            ...token,
+          },
+        };
+      }
+
+      return session;
     },
   },
 } satisfies NextAuthConfig;

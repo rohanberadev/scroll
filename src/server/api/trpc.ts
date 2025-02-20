@@ -122,33 +122,10 @@ export const protectedProcedure = t.procedure
       });
     }
 
-    const storedUser = await ctx.db.user.findFirst({
-      where: { id: ctx.session.user.id },
-      select: {
-        name: true,
-        id: true,
-        email: true,
-        emailVerified: true,
-        role: true,
-      },
-    });
-
-    if (!storedUser) {
-      throw new TRPCError({ code: "CONFLICT", message: "User not found." });
-    }
-
-    if (storedUser.role === "BANNED") {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "User is ban from accessing this resource",
-      });
-    }
-
     return next({
       ctx: {
         // infers the `session` as non-nullable
         session: { ...ctx.session, user: ctx.session.user },
-        user: storedUser,
       },
     });
   });

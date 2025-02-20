@@ -74,7 +74,18 @@ export const userRouter = createTRPCRouter({
   }),
 
   getUser: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.db.user.findMany();
+    const { session } = ctx;
+
+    const storedUser = await ctx.db.user.findFirst({
+      where: { id: session.user.id },
+      select: { password: false },
+    });
+
+    if (!storedUser) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
+    }
+
+    return storedUser;
   }),
 
   verifyEmail: publicProcedure

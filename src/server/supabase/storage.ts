@@ -19,8 +19,8 @@ export async function uploadImages(
       images.map(async (image) => {
         const imageResponse = await fetch(image.src);
         const blob = await imageResponse.blob();
-        const file = new File([blob], `${crypto.randomUUID()}.webp`, {
-          type: "image/webp",
+        const file = new File([blob], `${crypto.randomUUID()}`, {
+          type: blob.type,
         });
         return supabase.storage
           .from(bucket)
@@ -40,8 +40,6 @@ export async function uploadImages(
       }
     });
 
-    console.log("image uploaded");
-
     return { success: uploadedImages };
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -50,4 +48,19 @@ export async function uploadImages(
 
     return { error: "Something went wrong!" };
   }
+}
+
+export async function getPublicFile(file: {
+  path: string;
+  id: string;
+  createdAt: Date;
+  fullPath: string;
+  postId: string | null;
+}) {
+  const bucket = file.fullPath.split("/")[0];
+  const filePath = file.path;
+
+  const { data } = supabase.storage.from(bucket!).getPublicUrl(filePath);
+
+  return data;
 }

@@ -103,7 +103,7 @@ export default function CreatePostForm(props: { username: string }) {
         return;
       }
 
-      if (!mediaData || mediaData.length === 0) {
+      if (!Array.isArray(mediaData) || mediaData.length === 0) {
         setError("No images uploaded successfully.");
         setUploadStart(false);
         return;
@@ -114,12 +114,13 @@ export default function CreatePostForm(props: { username: string }) {
         .mutateAsync({
           caption,
           postType: postType as "PUBLIC" | "PRIVATE" | "DRAFT",
-          media: mediaData,
+          media: Array.isArray(mediaData) ? mediaData : [],
         })
         .then(({ success }) => {
           setSuccess(success);
         })
         .catch((error) => {
+          console.error("Error creating post while requesting on api:", error);
           if (error instanceof Error) {
             setError(error.message ?? "Failed to create post");
           }

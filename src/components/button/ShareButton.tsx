@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
@@ -8,14 +9,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { FiSend } from "react-icons/fi";
 
 type Props = {
   className?: string;
-  shareCount?: number;
+  shareCount: bigint;
 };
 
 export default function ShareButton({ className, shareCount }: Props) {
