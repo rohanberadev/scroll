@@ -107,6 +107,7 @@ model File {
     path      String
     fullPath  String
     postId    String?
+    publicUrl String?
     createdAt DateTime @default(now())
 
     post Post?  @relation(fields: [postId], references: [id])
@@ -189,16 +190,16 @@ model SavedPost {
 }
 
 model Follower {
-    id          String @id @default(cuid())
-    followerId  String
-    followingId String
+    id           String @id @default(cuid())
+    followedById String
+    followedToId String
 
-    follower  User @relation("FollowerUser", fields: [followerId], references: [id], onDelete: Cascade)
-    following User @relation("FollowingUser", fields: [followingId], references: [id], onDelete: Cascade)
+    followedBy User @relation("FollowerUser", fields: [followedById], references: [id], onDelete: Cascade)
+    followedTo User @relation("FollowingUser", fields: [followedToId], references: [id], onDelete: Cascade)
 
-    @@unique([followerId, followingId])
-    @@index([followerId])
-    @@index([followingId])
+    @@unique([followedById, followedToId])
+    @@index([followedById])
+    @@index([followedToId])
 }
 
 model FollowRequest {

@@ -50,6 +50,8 @@
     "motion": "^12.0.3",
     "next": "^15.1.5",
     "next-auth": "5.0.0-beta.25",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-easy-crop": "^5.2.0",

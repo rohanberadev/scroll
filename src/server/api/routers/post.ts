@@ -1,5 +1,6 @@
 import { createPostFormSchema } from "@/common/schema";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { supabase } from "@/server/supabase/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
@@ -7,7 +8,8 @@ export const postRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createPostFormSchema)
     .mutation(async function ({ ctx, input }) {
-      const { caption, media, postType } = input;
+      const { caption, postType } = input;
+      let { media } = input;
 
       if (media.length === 0) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "" });
@@ -16,11 +18,12 @@ export const postRouter = createTRPCRouter({
       const storedUser = await ctx.db.user
         .findFirst({
           where: {
-            AND: [{ id: ctx.session.user.id }, { NOT: { role: "BANNED" } }],
+            id: ctx.session.user.id,
           },
           select: {
             id: true,
             role: true,
+            name: true,
           },
         })
         .catch((error) => {
@@ -41,7 +44,16 @@ export const postRouter = createTRPCRouter({
       if (storedUser.role === "BANNED") {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "User is ban from accessing this resource",
+          message: "User is not authorized to access this resource!",
+        });
+      }
+
+      if (postType === "PUBLIC") {
+        media = media.map((m) => {
+          const { data } = supabase.storage
+            .from("post-public")
+            .getPublicUrl(m.path);
+          return { ...data, ...m };
         });
       }
 
@@ -88,7 +100,9 @@ export const postRouter = createTRPCRouter({
                 { type: "PUBLIC" },
                 {
                   type: "PRIVATE",
-                  postedBy: { Following: { some: { id: session.user.id } } },
+                  postedBy: {
+                    Following: { some: { followedToId: session.user.id } },
+                  },
                 },
               ],
             },
@@ -101,8 +115,8 @@ export const postRouter = createTRPCRouter({
             select: {
               name: true,
               Follower: {
-                select: { followerId: true },
-                where: { followerId: session.user.id },
+                select: { followedById: true },
+                where: { followedById: session.user.id },
               },
             },
           },
@@ -120,6 +134,7 @@ export const postRouter = createTRPCRouter({
         name: post.postedBy.name,
         isFollowedByUser: post.postedBy.Follower.length > 0,
       },
+      isPostOwner: post.postedById === ctx.session.user.id,
       isLikedByUser: post.Like.length > 0,
     }));
   }),
@@ -133,15 +148,31 @@ export const postRouter = createTRPCRouter({
       const storedPost = [
         await ctx.db.post
           .findFirst({
-            where: { id },
+            where: {
+              id,
+              OR: [
+                { type: "PUBLIC" },
+                {
+                  type: "PRIVATE",
+                  postedBy: {
+                    Following: { some: { followedToId: session.user.id } },
+                  },
+                },
+
+                {
+                  type: "DRAFT",
+                  postedById: session.user.id,
+                },
+              ],
+            },
             include: {
               files: true,
               postedBy: {
                 select: {
                   name: true,
                   Follower: {
-                    select: { followerId: true },
-                    where: { followerId: session.user.id },
+                    select: { followedById: true },
+                    where: { followedById: session.user.id },
                   },
                 },
               },
@@ -167,9 +198,12 @@ export const postRouter = createTRPCRouter({
               ...post,
               postedBy: {
                 name: post.postedBy.name,
-                isFollowedByUser: post.postedBy.Follower.length > 0,
+                isFollowedByUser:
+                  post.postedBy.Follower.length > 0 ||
+                  post.postedById === ctx.session.user.id,
               },
               isLikedByUser: post.Like.length > 0,
+              isPostOwner: post.postedById === ctx.session.user.id,
             }
           : null,
       );

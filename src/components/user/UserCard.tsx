@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import FollowButton from "@/components/button/FollowButton";
 import Avatar from "@/components/user/Avatar";
 import Link from "next/link";
 
@@ -15,7 +15,7 @@ export default function UserCard() {
         </Link>
       </div>
       <div>
-        <Button className="bg-blue-600">Follow</Button>
+        <FollowButton />
       </div>
     </div>
   );

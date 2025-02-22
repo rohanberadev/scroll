@@ -1,14 +1,14 @@
 import ProfileInfoButton from "@/components/button/ProfileInfoButton";
-import { Button } from "@/components/ui/button";
 import Avatar from "@/components/user/Avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import FollowButton from "../button/FollowButton";
 
 export default function ProfileCard(props: {
   enableFollowBtn?: boolean;
-  profileId?: string;
+  userId?: string;
 }) {
-  const { enableFollowBtn, profileId } = props;
+  const { enableFollowBtn, userId } = props;
 
   return (
     <div className="relative flex w-full items-center gap-x-6 rounded-t-lg border-gray-600 p-6 max-lg:border-b-[1px] lg:border-[1px]">
@@ -25,8 +25,8 @@ export default function ProfileCard(props: {
         <div className="flex w-full items-center justify-between px-4 max-lg:gap-x-6 max-lg:pt-4 lg:gap-x-12 lg:px-6">
           <Link
             href={
-              enableFollowBtn && profileId
-                ? `/profile/${profileId}/followers`
+              enableFollowBtn && userId
+                ? `/profile/${userId}/followers`
                 : "/profile/me/followers"
             }
             className="flex flex-col items-center justify-center"
@@ -36,8 +36,8 @@ export default function ProfileCard(props: {
           </Link>
           <Link
             href={
-              enableFollowBtn && profileId
-                ? `/profile/${profileId}/following`
+              enableFollowBtn && userId
+                ? `/profile/${userId}/following`
                 : "/profile/me/following"
             }
             className="flex flex-col items-center justify-center"
@@ -47,8 +47,8 @@ export default function ProfileCard(props: {
           </Link>
           <Link
             href={
-              enableFollowBtn && profileId
-                ? `/profile/${profileId}/posts`
+              enableFollowBtn && userId
+                ? `/profile/${userId}/posts`
                 : "/profile/me/posts"
             }
             className="flex flex-col items-center justify-center"
@@ -58,14 +58,12 @@ export default function ProfileCard(props: {
           </Link>
         </div>
 
-        <Button
+        <FollowButton
           className={cn(
-            "bg-blue-800 transition-colors duration-300",
+            "transition-colors duration-300",
             enableFollowBtn ? "block" : "hidden",
           )}
-        >
-          Follow
-        </Button>
+        />
       </div>
 
       {!enableFollowBtn && (

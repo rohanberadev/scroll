@@ -1,9 +1,6 @@
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { pusher } from "@/utils/pusher/server";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
 
 export const testRouter = createTRPCRouter({
   generate: publicProcedure.query(async function* () {
@@ -18,4 +15,12 @@ export const testRouter = createTRPCRouter({
     .query(async function ({ input }) {
       return { title: input.id };
     }),
+
+  hey: publicProcedure.mutation(async function () {
+    await pusher.trigger("my-channel", "my-event", {
+      message: "hello from server",
+    });
+
+    return { success: "Hey" };
+  }),
 });

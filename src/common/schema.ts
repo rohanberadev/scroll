@@ -38,7 +38,14 @@ export const createPostFormSchema = z.object({
     .string()
     .min(3, { message: "Description should be atleast 3 character(s) long." }),
   media: z
-    .array(z.object({ id: z.string(), path: z.string(), fullPath: z.string() }))
+    .array(
+      z.object({
+        id: z.string(),
+        path: z.string(),
+        fullPath: z.string(),
+        publicUrl: z.string().optional(),
+      }),
+    )
     .min(1, { message: "Atleast one media url should be there" })
     .max(5, { message: "Atmost 5 media urls are allowed" })
     .default([]),

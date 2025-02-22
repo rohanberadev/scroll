@@ -1,4 +1,5 @@
-import supabase from "@/utils/supabase/server";
+import type { BucketType } from "@/common/type";
+import { supabase } from "@/server/supabase/client";
 
 export async function uploadImages(
   images: { id: number; src: string }[],
@@ -6,7 +7,7 @@ export async function uploadImages(
   type: "PUBLIC" | "PRIVATE" | "DRAFT",
 ) {
   try {
-    let bucket: string;
+    let bucket: BucketType;
     if (type === "PRIVATE") {
       bucket = "post-private";
     } else if (type === "DRAFT") {
@@ -22,6 +23,7 @@ export async function uploadImages(
         const file = new File([blob], `${crypto.randomUUID()}`, {
           type: blob.type,
         });
+
         return supabase.storage
           .from(bucket)
           .upload(`${username}/${file.name}`, file, {

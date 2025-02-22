@@ -15,23 +15,48 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 
+import CommentButton from "@/components/button/CommentButton";
+import FollowButton from "@/components/button/FollowButton";
+import LikeButton from "@/components/button/LikeButton";
+import PostInfoButton from "@/components/button/PostInfoButton";
+import SaveButton from "@/components/button/SaveButton";
+import ShareButton from "@/components/button/ShareButton";
+import Avatar from "@/components/user/Avatar";
+
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-import CommentButton from "@/components/button/CommentButton";
-import LikeButton from "@/components/button/LikeButton";
-import Avatar from "@/components/user/Avatar";
 import { getPublicFile } from "@/server/supabase/storage";
 import type { RouterOutputs } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
-import PostInfoButton from "../button/PostInfoButton";
-import SaveButton from "../button/SaveButton";
-import ShareButton from "../button/ShareButton";
 
-function SupabaseImage(props: {
+function SupabasePublicImage(props: {
+  file: {
+    path: string;
+    id: string;
+    createdAt: Date;
+    fullPath: string;
+    postId: string | null;
+    publicUrl: string;
+  };
+}) {
+  const { file } = props;
+
+  return (
+    <Image
+      src={file.publicUrl}
+      fill
+      loading="lazy"
+      alt="image post"
+      className="object-cover"
+    />
+  );
+}
+
+function SupabaseSignedImage(props: {
   file: {
     path: string;
     id: string;
@@ -49,13 +74,17 @@ function SupabaseImage(props: {
     isError,
     error,
   } = useQuery({
-    queryKey: [`public-image${file.id}}`],
+    queryKey: [`signed-image${file.id}}`],
     queryFn: () => getPublicFile(file),
     enabled: Boolean(file),
   });
 
   if (isLoading) {
-    return <ClipLoader size={32} color="white" />;
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <ClipLoader size={64} color="white" />
+      </div>
+    );
   }
 
   if (isError) {
@@ -68,7 +97,7 @@ function SupabaseImage(props: {
         src={image.publicUrl}
         fill
         loading="lazy"
-        alt="Alt text"
+        alt="image post"
         className="object-cover"
       />
     );
@@ -82,7 +111,9 @@ function PostMedia(props: {
     createdAt: Date;
     fullPath: string;
     postId: string | null;
+    publicUrl: string | null;
   }[];
+  postType: "PRIVATE" | "PUBLIC" | "DRAFT";
 }) {
   const { files } = props;
 
@@ -131,7 +162,13 @@ function PostMedia(props: {
             className="relative select-none pl-[1px] pr-[1px]"
           >
             <AspectRatio ratio={5 / 6}>
-              <SupabaseImage file={file} />
+              {file.publicUrl ? (
+                <SupabasePublicImage
+                  file={{ ...file, publicUrl: file.publicUrl }}
+                />
+              ) : (
+                <SupabaseSignedImage file={file} />
+              )}
             </AspectRatio>
           </CarouselItem>
         ))}
@@ -152,17 +189,26 @@ export default function ShowPost(props: {
   return (
     <Card className="flex w-[400px] flex-col rounded-sm border-gray-600 bg-black text-stone-400 max-xs:rounded-none max-xs:border-l-0 max-xs:border-r-0 max-xs:border-t-0 md:w-[425px] lg:w-[450px] lg:border-[1px]">
       <CardHeader className="flex w-full flex-row items-center justify-between border-b-[1px] border-gray-400 p-4">
-        <Link href={"#"} className="flex items-center gap-x-4">
-          <Avatar />
-          <CardTitle>
-            {post.postedBy.name}{" "}
-            {post.postedBy.isFollowedByUser ? null : "Follow"}
+        <div className="flex items-center gap-x-4">
+          <Link href={`/profile/${post.postedBy.name}`}>
+            <Avatar />
+          </Link>
+          <CardTitle className="flex items-center gap-x-4">
+            <Link
+              href={`/profile/${post.postedBy.name}`}
+              className="transition-all duration-300 hover:underline"
+            >
+              {post.postedBy.name}
+            </Link>
+            {post.postedBy.isFollowedByUser || post.isPostOwner ? null : (
+              <FollowButton className="h-[22]" />
+            )}
           </CardTitle>
-        </Link>
+        </div>
         <PostInfoButton />
       </CardHeader>
       <CardContent className="w-full p-0">
-        {post.files && <PostMedia files={post.files} />}
+        {post.files && <PostMedia files={post.files} postType={post.type} />}
       </CardContent>
       <CardFooter className="flex flex-1 flex-col gap-y-6 border-t-[1px] border-gray-400 pt-4">
         <div className="flex w-full justify-between">

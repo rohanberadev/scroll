@@ -73,20 +73,40 @@ export const userRouter = createTRPCRouter({
     };
   }),
 
-  getUser: protectedProcedure.query(async ({ ctx }) => {
-    const { session } = ctx;
+  getUserByUsername: protectedProcedure
+    .input(z.object({ username: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { session } = ctx;
+      const { username } = input;
 
-    const storedUser = await ctx.db.user.findFirst({
-      where: { id: session.user.id },
-      select: { password: false },
-    });
+      const storedUser = [
+        await ctx.db.user
+          .findFirst({
+            where: { name: username },
+          })
+          .catch((error) => {
+            console.error("Error fetching user from db:", error);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Something went wrong!",
+            });
+          }),
+      ].map((user) =>
+        user
+          ? {
+              ...user,
+              password: "",
+              isProfileOwner: user.id === session.user.id,
+            }
+          : null,
+      );
 
-    if (!storedUser) {
-      throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
-    }
+      if (!storedUser || storedUser.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
+      }
 
-    return storedUser;
-  }),
+      return storedUser[0];
+    }),
 
   verifyEmail: publicProcedure
     .input(
