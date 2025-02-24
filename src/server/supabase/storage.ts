@@ -52,7 +52,7 @@ export async function uploadImages(
   }
 }
 
-export async function getPublicFile(file: {
+export async function getSignedUrl(file: {
   path: string;
   id: string;
   createdAt: Date;
@@ -62,7 +62,13 @@ export async function getPublicFile(file: {
   const bucket = file.fullPath.split("/")[0];
   const filePath = file.path;
 
-  const { data } = supabase.storage.from(bucket!).getPublicUrl(filePath);
+  const { data, error } = await supabase.storage
+    .from(bucket!)
+    .createSignedUrl(filePath, 120);
+
+  if (error) {
+    throw error;
+  }
 
   return data;
 }

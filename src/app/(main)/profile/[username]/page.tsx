@@ -16,15 +16,21 @@ export default async function ProfilePage({
     redirect("/not-found");
   }
 
+  console.log(user);
+
   return (
     <div className="h-full w-full lg:flex lg:items-center lg:justify-center lg:px-4 lg:pt-12">
       <div className="h-full w-full lg:flex lg:min-w-[650px] lg:max-w-[850px] lg:flex-col lg:items-center lg:justify-between lg:gap-y-2">
-        <ProfileCard enableFollowBtn={!user.isProfileOwner} />
-        {user.isProfileOwner ? (
-          <ProfileTabs />
-        ) : (
-          <PostsGrid heightMinusOffset={80} />
-        )}
+        <ProfileCard
+          enableFollowBtn={!(user.isProfileOwner || user.isFollowedByUser)}
+          username={user.name}
+          followers={user.followers}
+          following={user.following}
+          posts={user.posts}
+          userId={user.id}
+          isProfileOwner={user.isProfileOwner}
+        />
+        {user.isProfileOwner ? <ProfileTabs /> : <PostsGrid userId={user.id} />}
       </div>
     </div>
   );

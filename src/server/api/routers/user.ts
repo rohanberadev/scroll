@@ -83,6 +83,12 @@ export const userRouter = createTRPCRouter({
         await ctx.db.user
           .findFirst({
             where: { name: username },
+            include: {
+              Following: {
+                select: { followedById: true },
+                where: { followedById: session.user.id },
+              },
+            },
           })
           .catch((error) => {
             console.error("Error fetching user from db:", error);
@@ -97,6 +103,8 @@ export const userRouter = createTRPCRouter({
               ...user,
               password: "",
               isProfileOwner: user.id === session.user.id,
+              isFollowedByUser: user.Following.length > 0,
+              Following: null,
             }
           : null,
       );
@@ -159,5 +167,88 @@ export const userRouter = createTRPCRouter({
           message: "Something went wrong!",
         });
       }
+    }),
+
+  follow: protectedProcedure
+    .input(z.object({ userId: z.string().cuid() }))
+    .mutation(async function ({ ctx, input }) {
+      const { userId } = input;
+
+      const storedUser = await ctx.db.user
+        .findFirst({
+          where: {
+            id: userId,
+          },
+          include: {
+            Follower: {
+              select: { followedById: true },
+              where: { followedById: ctx.session.user.id },
+            },
+          },
+        })
+        .catch((error) => {
+          console.error(
+            "Error in follow user while fecthing user from db:",
+            error,
+          );
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        });
+
+      if (!storedUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
+      }
+
+      if (storedUser.Follower.length > 0) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "You are already following the user!",
+        });
+      }
+
+      if (storedUser.type === "PRIVATE") {
+        const followRequest = await ctx.db.followRequest.findUnique({
+          where: {
+            requestedById_requestedToId: {
+              requestedById: ctx.session.user.id,
+              requestedToId: userId,
+            },
+          },
+        });
+
+        if (followRequest) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Follow request already exist",
+          });
+        }
+
+        // TODO: send follow request notification
+
+        return { success: "Follow request has been send" };
+      } else {
+        await ctx.db.$transaction([
+          ctx.db.user.update({
+            where: { id: userId },
+            data: { followers: { increment: 1 } },
+          }),
+
+          ctx.db.user.update({
+            where: { id: ctx.session.user.id },
+            data: { following: { increment: 1 } },
+          }),
+
+          ctx.db.follower.create({
+            data: {
+              followedById: ctx.session.user.id,
+              followedToId: userId,
+            },
+          }),
+        ]);
+      }
+
+      return { success: `You are now following ${storedUser.name}` };
     }),
 });

@@ -54,7 +54,7 @@ export default async function getCroppedImage(
         else reject(new Error("Cannot create a image blob!"));
       },
       "image/jpeg",
-      1,
+      0.7,
     );
   });
 }

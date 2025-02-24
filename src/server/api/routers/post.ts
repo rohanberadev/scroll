@@ -101,7 +101,7 @@ export const postRouter = createTRPCRouter({
                 {
                   type: "PRIVATE",
                   postedBy: {
-                    Following: { some: { followedToId: session.user.id } },
+                    Follower: { some: { followedToId: session.user.id } },
                   },
                 },
               ],
@@ -114,7 +114,7 @@ export const postRouter = createTRPCRouter({
           postedBy: {
             select: {
               name: true,
-              Follower: {
+              Following: {
                 select: { followedById: true },
                 where: { followedById: session.user.id },
               },
@@ -132,7 +132,7 @@ export const postRouter = createTRPCRouter({
       ...post,
       postedBy: {
         name: post.postedBy.name,
-        isFollowedByUser: post.postedBy.Follower.length > 0,
+        isFollowedByUser: post.postedBy.Following.length > 0,
       },
       isPostOwner: post.postedById === ctx.session.user.id,
       isLikedByUser: post.Like.length > 0,
@@ -155,7 +155,7 @@ export const postRouter = createTRPCRouter({
                 {
                   type: "PRIVATE",
                   postedBy: {
-                    Following: { some: { followedToId: session.user.id } },
+                    Follower: { some: { followedToId: session.user.id } },
                   },
                 },
 
@@ -170,7 +170,7 @@ export const postRouter = createTRPCRouter({
               postedBy: {
                 select: {
                   name: true,
-                  Follower: {
+                  Following: {
                     select: { followedById: true },
                     where: { followedById: session.user.id },
                   },
@@ -198,9 +198,7 @@ export const postRouter = createTRPCRouter({
               ...post,
               postedBy: {
                 name: post.postedBy.name,
-                isFollowedByUser:
-                  post.postedBy.Follower.length > 0 ||
-                  post.postedById === ctx.session.user.id,
+                isFollowedByUser: post.postedBy.Following.length > 0,
               },
               isLikedByUser: post.Like.length > 0,
               isPostOwner: post.postedById === ctx.session.user.id,
@@ -213,5 +211,44 @@ export const postRouter = createTRPCRouter({
       }
 
       return storedPost[0];
+    }),
+
+  getInfinitePostsOfUser: protectedProcedure
+    .input(z.object({ userId: z.string().cuid() }))
+    .query(async function ({ ctx, input }) {
+      try {
+        return await ctx.db.post.findMany({
+          where: {
+            postedById: input.userId,
+            OR: [
+              { type: "PUBLIC" },
+              {
+                type: "PRIVATE",
+                postedBy: {
+                  Follower: { some: { followedToId: ctx.session.user.id } },
+                },
+              },
+            ],
+          },
+          select: {
+            files: { take: 1, orderBy: { createdAt: "asc" } },
+            likes: true,
+            shares: true,
+            id: true,
+          },
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
     }),
 });
