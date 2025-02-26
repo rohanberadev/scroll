@@ -4,13 +4,13 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 
-import { useState } from "react";
-import { FaComment } from "react-icons/fa";
-import { GoHeartFill } from "react-icons/go";
 import {
   SupabasePublicImage,
   SupabaseSignedImage,
-} from "../image/SupabaseImage";
+} from "@/components/image/SupabaseImage";
+import { useState } from "react";
+import { FaComment } from "react-icons/fa";
+import { GoHeartFill } from "react-icons/go";
 
 export default function PostGridBox(props: {
   file: {

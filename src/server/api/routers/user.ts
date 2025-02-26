@@ -4,7 +4,6 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-import { sendEmailVerification } from "@/server/jobs/send-email";
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -60,13 +59,13 @@ export const userRouter = createTRPCRouter({
         });
       });
 
-    await sendEmailVerification({
-      userId: user.id,
-      username: user.name,
-      email: user.email,
-    }).catch((error) => {
-      console.error("Error creating user while sending email job:", error);
-    });
+    // await sendEmailVerification({
+    //   userId: user.id,
+    //   username: user.name,
+    //   email: user.email,
+    // }).catch((error) => {
+    //   console.error("Error creating user while sending email job:", error);
+    // });
 
     return {
       success: "User is created",
@@ -395,4 +394,53 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
+
+  searchPeopleByUsername: protectedProcedure
+    .input(z.object({ query: z.string() }))
+    .query(async function ({ ctx, input }) {
+      try {
+        return (
+          await ctx.db.user.findMany({
+            where: {
+              name: { contains: input.query, mode: "insensitive" },
+              NOT: { id: ctx.session.user.id },
+            },
+            select: {
+              id: true,
+              name: true,
+              followers: true,
+              Following: {
+                select: { followerId: true },
+                where: { followerId: ctx.session.user.id },
+              },
+              image: {
+                select: { publicUrl: true },
+              },
+            },
+          })
+        ).map(({ Following, ...user }) =>
+          user
+            ? {
+                ...user,
+                isFollowedByUser: Following.length > 0,
+              }
+            : null,
+        );
+      } catch (error) {
+        console.error(
+          "Error in searchPeopleByUsername while fecthing from db:",
+          error,
+        );
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
+    }),
 });

@@ -24,7 +24,6 @@ export function TopPublicPosts() {
   }
 
   if (isSuccess) {
-    console.log(posts);
     return (
       <div className="grid w-full grid-cols-3">
         {posts.map((post, index) => (
@@ -69,7 +68,6 @@ export function UserPublicPostsGrid(props: { userId: string }) {
   }
 
   if (isSuccess) {
-    console.log(posts);
     return (
       <div className="grid w-full grid-cols-3">
         {posts.map((post, index) => (
@@ -107,7 +105,6 @@ export function MyUserAllTypePostsGrid() {
   }
 
   if (isSuccess) {
-    console.log(posts);
     return (
       <div className="grid w-full grid-cols-3">
         {posts.map((post, index) => (
@@ -145,7 +142,6 @@ export function MyUserFollowerTypePostsGrid() {
   }
 
   if (isSuccess) {
-    console.log(posts);
     return (
       <div className="grid w-full grid-cols-3">
         {posts.map((post, index) => (
@@ -183,7 +179,6 @@ export function MyUserMeTypePostsGrid() {
   }
 
   if (isSuccess) {
-    console.log(posts);
     return (
       <div className="grid w-full grid-cols-3">
         {posts.map((post, index) => (

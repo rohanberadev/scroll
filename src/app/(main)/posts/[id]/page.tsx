@@ -14,6 +14,7 @@ export default async function Post({
   });
 
   if (!post) {
+    console.log(post);
     redirect("/not-found");
   }
 

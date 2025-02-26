@@ -145,7 +145,6 @@ export const postRouter = createTRPCRouter({
     .input(z.object({ id: z.string().cuid() }))
     .query(async function ({ ctx, input }) {
       const { id } = input;
-      const { session } = ctx;
 
       const storedPost = [
         await ctx.db.post
@@ -157,13 +156,16 @@ export const postRouter = createTRPCRouter({
                 {
                   type: "FOLLOWER",
                   postedBy: {
-                    Following: { some: { followerId: session.user.id } },
+                    Following: { some: { followerId: ctx.session.user.id } },
                   },
                 },
-
+                {
+                  type: "FOLLOWER",
+                  postedById: ctx.session.user.id,
+                },
                 {
                   type: "ME",
-                  postedById: session.user.id,
+                  postedById: ctx.session.user.id,
                 },
               ],
             },
@@ -174,13 +176,13 @@ export const postRouter = createTRPCRouter({
                   name: true,
                   Following: {
                     select: { followerId: true },
-                    where: { followerId: session.user.id },
+                    where: { followerId: ctx.session.user.id },
                   },
                 },
               },
               Like: {
                 select: { likedById: true },
-                where: { likedById: session.user.id },
+                where: { likedById: ctx.session.user.id },
               },
             },
           })
@@ -365,6 +367,7 @@ export const postRouter = createTRPCRouter({
               },
             },
           ],
+          NOT: [{ postedById: ctx.session.user.id }],
         },
         select: {
           files: { take: 1, orderBy: { createdAt: "asc" } },
