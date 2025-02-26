@@ -86,7 +86,9 @@ export default function SideNav(props: { username: string }) {
               avatarContainerStyles="h-auto w-full items-center gap-x-6 rounded-full"
               avatarImageStyles="h-6 w-6 rounded-full object-cover"
               AvatarLabel={<span className="text-[1rem]">Profile</span>}
-              active={pathname.includes(username)}
+              active={
+                pathname.split("/")[pathname.split("/").length - 1] === username
+              }
             />
           </Link>
         </li>

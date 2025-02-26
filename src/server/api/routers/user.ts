@@ -343,4 +343,56 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
+
+  getTopInfinitePeople: protectedProcedure.query(async function ({ ctx }) {
+    try {
+      return (
+        await ctx.db.user.findMany({
+          where: {
+            NOT: [{ id: ctx.session.user.id }],
+          },
+
+          select: {
+            id: true,
+            name: true,
+            followers: true,
+            Following: {
+              select: { followerId: true },
+              where: { followerId: ctx.session.user.id },
+            },
+            image: {
+              select: { publicUrl: true },
+            },
+          },
+          orderBy: [
+            { createdAt: "desc" },
+            { followers: "desc" },
+            { posts: "desc" },
+          ],
+        })
+      ).map(({ Following, ...user }) =>
+        user
+          ? {
+              ...user,
+              isFollowedByUser: Following.length > 0,
+            }
+          : null,
+      );
+    } catch (error) {
+      console.error(
+        "Error in getTopInfinitePeople while fecthing from db:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
 });

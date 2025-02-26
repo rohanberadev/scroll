@@ -16,8 +16,7 @@ export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth().catch(() => redirect("/sign-in"));
-  const username = session?.user.name;
-  if (!username) {
+  if (!session) {
     redirect("/sign-in");
   }
 
@@ -27,7 +26,7 @@ export default async function AppLayout({
       <AppHeader />
 
       {/* Desktop Nav */}
-      <SideNav username={username} />
+      <SideNav username={session.user.name} />
 
       {/* <main className="flex w-full flex-col items-center lg:flex-1 lg:pl-[250px] xl:pl-[325px]">
         {children}
@@ -36,7 +35,7 @@ export default async function AppLayout({
       <MainApp>{children}</MainApp>
 
       {/* Mobile Nav */}
-      <BottomNav username={username} />
+      <BottomNav username={session.user.name} />
     </div>
   );
 }
