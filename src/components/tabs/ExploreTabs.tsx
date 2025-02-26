@@ -1,8 +1,8 @@
-import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
-import MyTabsTrigger from "./MyTabsTrigger";
-import PostsGrid from "@/components/post/PostsGrid";
+import { TopPublicPosts } from "@/components/post/PostGrids";
 import TabsContainer from "@/components/tabs/TabsContainer";
+import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 import UserCard from "@/components/user/UserCard";
+import MyTabsTrigger from "./MyTabsTrigger";
 
 export default function ExploreTabs() {
   const array = Array.from({ length: 10 });
@@ -16,7 +16,7 @@ export default function ExploreTabs() {
       </TabsList>
       <TabsContent value="posts" className="mt-3">
         <TabsContainer>
-          <PostsGrid heightMinusOffset={80} />
+          <TopPublicPosts />
         </TabsContainer>
       </TabsContent>
       <TabsContent value="people" className="mt-3">

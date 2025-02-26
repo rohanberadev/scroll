@@ -1,7 +1,7 @@
+import PostsGrid from "@/components/post/PostGrids";
+import TabsContainer from "@/components/tabs/TabsContainer";
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 import MyTabsTrigger from "./MyTabsTrigger";
-import PostsGrid from "@/components/post/PostsGrid";
-import TabsContainer from "@/components/tabs/TabsContainer";
 
 export default function CreatePostTabs() {
   return (

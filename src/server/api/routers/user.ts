@@ -85,8 +85,8 @@ export const userRouter = createTRPCRouter({
             where: { name: username },
             include: {
               Following: {
-                select: { followedById: true },
-                where: { followedById: session.user.id },
+                select: { followerId: true },
+                where: { followerId: session.user.id },
               },
             },
           })
@@ -181,8 +181,8 @@ export const userRouter = createTRPCRouter({
           },
           include: {
             Follower: {
-              select: { followedById: true },
-              where: { followedById: ctx.session.user.id },
+              select: { followerId: true },
+              where: { followerId: ctx.session.user.id },
             },
           },
         })
@@ -208,7 +208,7 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      if (storedUser.type === "PRIVATE") {
+      if (storedUser.followPermission) {
         const followRequest = await ctx.db.followRequest.findUnique({
           where: {
             requestedById_requestedToId: {
@@ -240,10 +240,10 @@ export const userRouter = createTRPCRouter({
             data: { following: { increment: 1 } },
           }),
 
-          ctx.db.follower.create({
+          ctx.db.follow.create({
             data: {
-              followedById: ctx.session.user.id,
-              followedToId: userId,
+              followerId: ctx.session.user.id,
+              followingId: userId,
             },
           }),
         ]);
@@ -251,4 +251,96 @@ export const userRouter = createTRPCRouter({
 
       return { success: `You are now following ${storedUser.name}` };
     }),
+
+  getMyAllTypeInfinitePosts: protectedProcedure.query(async function ({ ctx }) {
+    try {
+      return await ctx.db.post.findMany({
+        where: { postedById: ctx.session.user.id, type: "ALL" },
+        select: {
+          files: { take: 1, orderBy: { createdAt: "asc" } },
+          likes: true,
+          shares: true,
+          id: true,
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Error in getMyAllTypeInfinitePosts while fetching posts:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
+
+  getMyFollowerTypeInfinitePosts: protectedProcedure.query(async function ({
+    ctx,
+  }) {
+    try {
+      return await ctx.db.post.findMany({
+        where: { postedById: ctx.session.user.id, type: "FOLLOWER" },
+        select: {
+          files: { take: 1, orderBy: { createdAt: "asc" } },
+          likes: true,
+          shares: true,
+          id: true,
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Error in getMyFollowerTypeInfinitePosts while fetching posts:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
+
+  getMyMeTypeInfinitePosts: protectedProcedure.query(async function ({ ctx }) {
+    try {
+      return await ctx.db.post.findMany({
+        where: { postedById: ctx.session.user.id, type: "ME" },
+        select: {
+          files: { take: 1, orderBy: { createdAt: "asc" } },
+          likes: true,
+          shares: true,
+          id: true,
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Error in getMyMeTypeInfinitePosts while fetching posts:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
 });

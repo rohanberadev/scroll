@@ -1,4 +1,4 @@
-import PostsGrid from "@/components/post/PostsGrid";
+import { UserPublicPostsGrid } from "@/components/post/PostGrids";
 import ProfileTabs from "@/components/tabs/ProfileTabs";
 import ProfileCard from "@/components/user/ProfileCard";
 import { api } from "@/trpc/server";
@@ -16,8 +16,6 @@ export default async function ProfilePage({
     redirect("/not-found");
   }
 
-  console.log(user);
-
   return (
     <div className="h-full w-full lg:flex lg:items-center lg:justify-center lg:px-4 lg:pt-12">
       <div className="h-full w-full lg:flex lg:min-w-[650px] lg:max-w-[850px] lg:flex-col lg:items-center lg:justify-between lg:gap-y-2">
@@ -30,7 +28,11 @@ export default async function ProfilePage({
           userId={user.id}
           isProfileOwner={user.isProfileOwner}
         />
-        {user.isProfileOwner ? <ProfileTabs /> : <PostsGrid userId={user.id} />}
+        {user.isProfileOwner ? (
+          <ProfileTabs />
+        ) : (
+          <UserPublicPostsGrid userId={user.id} />
+        )}
       </div>
     </div>
   );

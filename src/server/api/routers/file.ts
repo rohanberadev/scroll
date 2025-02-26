@@ -64,7 +64,7 @@ export const fileRouter = createTRPCRouter({
         where: {
           id: postId,
           postedBy: {
-            Following: { some: { followedToId: ctx.session.user.id } },
+            Following: { some: { followingId: ctx.session.user.id } },
           },
         },
       });

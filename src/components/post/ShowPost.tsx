@@ -54,7 +54,8 @@ export default function ShowPost(props: {
               activeColor="text-red-600"
               active={post.isLikedByUser}
               className="h-[1.4rem] w-[1.4rem]"
-              likeCount={post.likes}
+              likes={post.likes}
+              postId={post.id}
             />
             <CommentButton className="h-5 w-5" commentCount={post.comments} />
             <ShareButton className="h-5 w-5" shareCount={post.shares} />

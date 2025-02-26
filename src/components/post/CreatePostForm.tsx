@@ -14,6 +14,7 @@ import { useDrawer, useImage } from "@/common/store";
 import { cn } from "@/lib/utils";
 import { uploadImages } from "@/server/supabase/storage";
 import { api } from "@/trpc/react";
+import type { PostType } from "@prisma/client";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { IoAddSharp } from "react-icons/io5";
@@ -42,7 +43,7 @@ export default function CreatePostForm(props: { username: string }) {
   const [error, setError] = useState("");
 
   const [caption, setCaption] = useState("");
-  const [postType, setPostType] = useState("PUBLIC");
+  const [postType, setPostType] = useState("ALL");
 
   const createPost = api.post.create.useMutation();
 
@@ -80,7 +81,7 @@ export default function CreatePostForm(props: { username: string }) {
       const results = await uploadImages(
         images,
         username,
-        postType as "PUBLIC" | "PRIVATE" | "DRAFT",
+        postType as PostType,
       );
 
       if (results.error) {
@@ -113,7 +114,7 @@ export default function CreatePostForm(props: { username: string }) {
       await createPost
         .mutateAsync({
           caption,
-          postType: postType as "PUBLIC" | "PRIVATE" | "DRAFT",
+          postType: postType as PostType,
           media: Array.isArray(mediaData) ? mediaData : [],
         })
         .then(({ success }) => {
@@ -237,15 +238,15 @@ export default function CreatePostForm(props: { username: string }) {
       </div>
 
       <div className="mb-8">
-        <label className="ml-1 text-sm text-gray-400">Type</label>
+        <label className="ml-1 text-sm text-gray-400">Visibility</label>
         <Select value={postType} onValueChange={setPostType}>
           <SelectTrigger className="mt-1 w-[180px] border-gray-600">
-            <SelectValue placeholder="Public" />
+            <SelectValue placeholder="All" />
           </SelectTrigger>
           <SelectContent className="border-gray-600 bg-black text-gray-400">
-            <SelectItem value="PUBLIC">Public</SelectItem>
-            <SelectItem value="PRIVATE">Private</SelectItem>
-            <SelectItem value="DRAFT">Draft</SelectItem>
+            <SelectItem value="ALL">All</SelectItem>
+            <SelectItem value="FOLLOWER">Follower</SelectItem>
+            <SelectItem value="ME">Me</SelectItem>
           </SelectContent>
         </Select>
 

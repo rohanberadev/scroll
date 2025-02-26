@@ -48,7 +48,7 @@ export const postRouter = createTRPCRouter({
         });
       }
 
-      if (postType === "PUBLIC") {
+      if (postType === "ALL" || postType === "FOLLOWER") {
         media = media.map((m) => {
           const { data } = supabase.storage
             .from("post-public")
@@ -97,11 +97,13 @@ export const postRouter = createTRPCRouter({
           AND: [
             {
               OR: [
-                { type: "PUBLIC" },
                 {
-                  type: "PRIVATE",
+                  type: "ALL",
+                },
+                {
+                  type: "FOLLOWER",
                   postedBy: {
-                    Follower: { some: { followedToId: session.user.id } },
+                    Following: { some: { followerId: session.user.id } },
                   },
                 },
               ],
@@ -115,8 +117,8 @@ export const postRouter = createTRPCRouter({
             select: {
               name: true,
               Following: {
-                select: { followedById: true },
-                where: { followedById: session.user.id },
+                select: { followerId: true },
+                where: { followerId: session.user.id },
               },
             },
           },
@@ -151,16 +153,16 @@ export const postRouter = createTRPCRouter({
             where: {
               id,
               OR: [
-                { type: "PUBLIC" },
+                { type: "ALL" },
                 {
-                  type: "PRIVATE",
+                  type: "FOLLOWER",
                   postedBy: {
-                    Follower: { some: { followedToId: session.user.id } },
+                    Following: { some: { followerId: session.user.id } },
                   },
                 },
 
                 {
-                  type: "DRAFT",
+                  type: "ME",
                   postedById: session.user.id,
                 },
               ],
@@ -171,8 +173,8 @@ export const postRouter = createTRPCRouter({
                 select: {
                   name: true,
                   Following: {
-                    select: { followedById: true },
-                    where: { followedById: session.user.id },
+                    select: { followerId: true },
+                    where: { followerId: session.user.id },
                   },
                 },
               },
@@ -221,11 +223,11 @@ export const postRouter = createTRPCRouter({
           where: {
             postedById: input.userId,
             OR: [
-              { type: "PUBLIC" },
+              { type: "ALL" },
               {
-                type: "PRIVATE",
+                type: "FOLLOWER",
                 postedBy: {
-                  Follower: { some: { followedToId: ctx.session.user.id } },
+                  Following: { some: { followerId: ctx.session.user.id } },
                 },
               },
             ],
@@ -251,4 +253,143 @@ export const postRouter = createTRPCRouter({
         });
       }
     }),
+
+  toggleLike: protectedProcedure
+    .input(z.object({ postId: z.string().cuid() }))
+    .mutation(async function ({ ctx, input }) {
+      const { postId } = input;
+
+      const storedPost = await ctx.db.post
+        .findFirst({ where: { id: postId } })
+        .catch((error) => {
+          console.error(
+            "Error in toggleLike post while fetching post from db:",
+            error,
+          );
+          if (error instanceof Error) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: error.message,
+            });
+          }
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        });
+
+      if (!storedPost) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found!" });
+      }
+
+      const storedLike = await ctx.db.like.findUnique({
+        where: { likedById_postId: { postId, likedById: ctx.session.user.id } },
+      });
+
+      if (storedLike) {
+        // Unlike the post
+        try {
+          await ctx.db.$transaction([
+            ctx.db.post.update({
+              where: { id: postId },
+              data: { likes: { decrement: 1 } },
+            }),
+            ctx.db.like.delete({
+              where: {
+                likedById_postId: { postId, likedById: ctx.session.user.id },
+              },
+            }),
+          ]);
+        } catch (error) {
+          console.error(
+            "Error in toggleLike post while storing like in db:",
+            error,
+          );
+          if (error instanceof Error) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: error.message,
+            });
+          }
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        }
+        return { success: -1 };
+      } else {
+        // Like the post
+        try {
+          await ctx.db.$transaction([
+            ctx.db.post.update({
+              where: { id: postId },
+              data: { likes: { increment: 1 } },
+            }),
+            ctx.db.like.create({
+              data: { likedById: ctx.session.user.id, postId },
+            }),
+          ]);
+        } catch (error) {
+          console.error(
+            "Error in toggleLike post while storing like in db:",
+            error,
+          );
+          if (error instanceof Error) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: error.message,
+            });
+          }
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        }
+        return { success: +1 };
+      }
+    }),
+
+  getInfiniteTopPosts: protectedProcedure.query(async function ({ ctx }) {
+    try {
+      return await ctx.db.post.findMany({
+        where: {
+          OR: [
+            { type: "ALL" },
+            {
+              type: "FOLLOWER",
+              postedBy: {
+                Following: { some: { followerId: ctx.session.user.id } },
+              },
+            },
+          ],
+        },
+        select: {
+          files: { take: 1, orderBy: { createdAt: "asc" } },
+          likes: true,
+          shares: true,
+          id: true,
+        },
+        orderBy: { likes: "desc" },
+      });
+    } catch (error) {
+      console.error(
+        "Error in getInfiniteTopPosts post while fetching post from db:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
 });

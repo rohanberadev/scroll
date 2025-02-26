@@ -15,6 +15,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
+import type { PostType } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export default function PostMedia(props: {
@@ -26,7 +27,7 @@ export default function PostMedia(props: {
     postId: string | null;
     publicUrl: string | null;
   }[];
-  postType: "PRIVATE" | "PUBLIC" | "DRAFT";
+  postType: PostType;
 }) {
   const { files } = props;
 

@@ -1,17 +1,16 @@
 import type { BucketType } from "@/common/type";
 import { supabase } from "@/server/supabase/client";
+import type { PostType } from "@prisma/client";
 
 export async function uploadImages(
   images: { id: number; src: string }[],
   username: string,
-  type: "PUBLIC" | "PRIVATE" | "DRAFT",
+  type: PostType,
 ) {
   try {
     let bucket: BucketType;
-    if (type === "PRIVATE") {
+    if (type === "ME") {
       bucket = "post-private";
-    } else if (type === "DRAFT") {
-      bucket = "post-draft";
     } else {
       bucket = "post-public";
     }

@@ -8,21 +8,20 @@ datasource db {
 }
 
 model User {
-    id            String     @id @default(cuid())
-    name          String     @unique
-    email         String     @unique
-    password      String
-    imageId       String?
-    role          UserRole   @default(USER)
-    bio           String?
-    followers     BigInt     @default(0)
-    following     BigInt     @default(0)
-    posts         BigInt     @default(0)
-    status        UserStatus @default(OFFLINE)
-    emailVerified DateTime?
-    type          UserType   @default(PUBLIC)
-    createdAt     DateTime   @default(now())
-    updatedAt     DateTime
+    id               String    @id @default(cuid())
+    name             String    @unique
+    email            String    @unique
+    password         String
+    imageId          String?
+    role             UserRole  @default(USER)
+    bio              String?
+    followers        BigInt    @default(0)
+    following        BigInt    @default(0)
+    posts            BigInt    @default(0)
+    emailVerified    DateTime?
+    followPermission Boolean   @default(false)
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime
 
     accounts            Account[]
     sessions            Session[]
@@ -31,8 +30,8 @@ model User {
     Like                Like[]
     Comment             Comment[]
     SavedPost           SavedPost[]
-    Follower            Follower[]          @relation("FollowerUser")
-    Following           Follower[]          @relation("FollowingUser")
+    Follower            Follow[]            @relation("FollowedByUser")
+    Following           Follow[]            @relation("FollowedToUser")
     SharedByUser        Share[]             @relation("SharedByUser")
     SharedToUser        Share[]             @relation("SharedToUser")
     FollowRequestByUser FollowRequest[]     @relation("FollowRequestByUser")
@@ -87,7 +86,7 @@ model Post {
     shares     BigInt    @default(0)
     comments   BigInt    @default(0)
     views      BigInt    @default(0)
-    type       PostType  @default(DRAFT)
+    type       PostType
     postedById String
     postedAt   DateTime  @default(now())
     updatedAt  DateTime  @updatedAt
@@ -145,6 +144,8 @@ model Like {
 
     post    Post @relation(fields: [postId], references: [id], onDelete: Cascade)
     likedBy User @relation(fields: [likedById], references: [id], onDelete: Cascade)
+
+    @@unique([likedById, postId])
 }
 
 model Share {
@@ -190,17 +191,17 @@ model SavedPost {
     savedBy User @relation(fields: [savedById], references: [id], onDelete: Cascade)
 }
 
-model Follower {
-    id           String @id @default(cuid())
-    followedById String
-    followedToId String
+model Follow {
+    id          String @id @default(cuid())
+    followerId  String
+    followingId String
 
-    followedBy User @relation("FollowerUser", fields: [followedById], references: [id], onDelete: Cascade)
-    followedTo User @relation("FollowingUser", fields: [followedToId], references: [id], onDelete: Cascade)
+    followerUser  User @relation("FollowedByUser", fields: [followerId], references: [id], onDelete: Cascade)
+    followingUser User @relation("FollowedToUser", fields: [followingId], references: [id], onDelete: Cascade)
 
-    @@unique([followedById, followedToId])
-    @@index([followedById])
-    @@index([followedToId])
+    @@unique([followerId, followingId])
+    @@index([followerId])
+    @@index([followingId])
 }
 
 model FollowRequest {
@@ -281,20 +282,15 @@ enum UserRole {
     BANNED
 }
 
-enum UserType {
-    PRIVATE
-    PUBLIC
-}
-
 enum UserStatus {
     ONLINE
     OFFLINE
 }
 
 enum PostType {
-    DRAFT
-    PRIVATE
-    PUBLIC
+    ALL
+    FOLLOWER
+    ME
 }
 
 enum ReportType {
