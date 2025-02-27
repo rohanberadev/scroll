@@ -22,9 +22,9 @@ export default function PostGridBox(props: {
     postId: string | null;
   };
   likes: bigint;
-  shares: bigint;
+  comments: bigint;
 }) {
-  const { file, likes, shares } = props;
+  const { file, likes, comments } = props;
 
   const [hover, setHover] = useState(false);
 
@@ -61,7 +61,7 @@ export default function PostGridBox(props: {
         </div>
         <div className="flex flex-col items-center">
           <FaComment className="h-5 w-5 text-white lg:h-6 lg:w-6" />
-          <span className="text-white max-lg:text-xs">{shares}</span>
+          <span className="text-white max-lg:text-xs">{comments}</span>
         </div>
       </motion.div>
     </motion.div>

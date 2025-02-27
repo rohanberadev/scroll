@@ -31,7 +31,7 @@ export function TopPublicPosts() {
             {post.files[0] && (
               <PostGridBox
                 likes={post.likes}
-                shares={post.shares}
+                comments={post.comments}
                 file={post.files[0]}
               />
             )}
@@ -75,7 +75,7 @@ export function UserPublicPostsGrid(props: { userId: string }) {
             {post.files[0] && (
               <PostGridBox
                 likes={post.likes}
-                shares={post.shares}
+                comments={post.comments}
                 file={post.files[0]}
               />
             )}
@@ -112,7 +112,7 @@ export function MyUserAllTypePostsGrid() {
             {post.files[0] && (
               <PostGridBox
                 likes={post.likes}
-                shares={post.shares}
+                comments={post.comments}
                 file={post.files[0]}
               />
             )}
@@ -149,7 +149,7 @@ export function MyUserFollowerTypePostsGrid() {
             {post.files[0] && (
               <PostGridBox
                 likes={post.likes}
-                shares={post.shares}
+                comments={post.comments}
                 file={post.files[0]}
               />
             )}
@@ -186,7 +186,7 @@ export function MyUserMeTypePostsGrid() {
             {post.files[0] && (
               <PostGridBox
                 likes={post.likes}
-                shares={post.shares}
+                comments={post.comments}
                 file={post.files[0]}
               />
             )}

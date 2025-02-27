@@ -258,7 +258,7 @@ export const userRouter = createTRPCRouter({
         select: {
           files: { take: 1, orderBy: { createdAt: "asc" } },
           likes: true,
-          shares: true,
+          comments: true,
           id: true,
         },
       });
@@ -290,7 +290,7 @@ export const userRouter = createTRPCRouter({
         select: {
           files: { take: 1, orderBy: { createdAt: "asc" } },
           likes: true,
-          shares: true,
+          comments: true,
           id: true,
         },
       });
@@ -320,7 +320,7 @@ export const userRouter = createTRPCRouter({
         select: {
           files: { take: 1, orderBy: { createdAt: "asc" } },
           likes: true,
-          shares: true,
+          comments: true,
           id: true,
         },
       });

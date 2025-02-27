@@ -42,6 +42,7 @@ model User {
     CommentReport       CommentReport[]
     VerificationToken   VerificationToken[]
     image               File?               @relation(fields: [imageId], references: [id])
+    CommenLike          CommenLike[]
 
     @@index([name])
 }
@@ -179,6 +180,19 @@ model Comment {
 
     replies       Comment[]       @relation("CommentToParent")
     CommentReport CommentReport[]
+    CommenLike    CommenLike[]
+}
+
+model CommenLike {
+    id        String   @id @default(cuid())
+    likedById String
+    commentId String
+    createdAt DateTime @default(now())
+
+    LikedByUser User    @relation(fields: [likedById], references: [id], onDelete: Cascade)
+    Comment     Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+    @@unique([likedById, commentId])
 }
 
 model SavedPost {

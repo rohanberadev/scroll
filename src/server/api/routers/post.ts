@@ -237,7 +237,7 @@ export const postRouter = createTRPCRouter({
           select: {
             files: { take: 1, orderBy: { createdAt: "asc" } },
             likes: true,
-            shares: true,
+            comments: true,
             id: true,
           },
         });
@@ -372,7 +372,7 @@ export const postRouter = createTRPCRouter({
         select: {
           files: { take: 1, orderBy: { createdAt: "asc" } },
           likes: true,
-          shares: true,
+          comments: true,
           id: true,
         },
         orderBy: { likes: "desc" },
@@ -395,4 +395,108 @@ export const postRouter = createTRPCRouter({
       });
     }
   }),
+
+  getLikeCount: protectedProcedure
+    .input(z.object({ postId: z.string().cuid() }))
+    .query(async function ({ ctx, input }) {
+      const post = await ctx.db.post
+        .findFirst({
+          where: {
+            id: input.postId,
+            OR: [
+              { type: "ALL" },
+              {
+                type: "FOLLOWER",
+                postedBy: {
+                  Following: { some: { followerId: ctx.session.user.id } },
+                },
+              },
+              {
+                type: "FOLLOWER",
+                postedById: ctx.session.user.id,
+              },
+              {
+                type: "ME",
+                postedById: ctx.session.user.id,
+              },
+            ],
+          },
+          select: { likes: true },
+        })
+        .catch((error) => {
+          console.error(
+            "Error in getLikeCount post while fetching post from db:",
+            error,
+          );
+          if (error instanceof Error) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: error.message,
+            });
+          }
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        });
+
+      if (!post) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found!" });
+      }
+
+      return post.likes;
+    }),
+
+  getCommentCount: protectedProcedure
+    .input(z.object({ postId: z.string().cuid() }))
+    .query(async function ({ ctx, input }) {
+      const post = await ctx.db.post
+        .findFirst({
+          where: {
+            id: input.postId,
+            OR: [
+              { type: "ALL" },
+              {
+                type: "FOLLOWER",
+                postedBy: {
+                  Following: { some: { followerId: ctx.session.user.id } },
+                },
+              },
+              {
+                type: "FOLLOWER",
+                postedById: ctx.session.user.id,
+              },
+              {
+                type: "ME",
+                postedById: ctx.session.user.id,
+              },
+            ],
+          },
+          select: { comments: true },
+        })
+        .catch((error) => {
+          console.error(
+            "Error in getLikeCount post while fetching post from db:",
+            error,
+          );
+          if (error instanceof Error) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: error.message,
+            });
+          }
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Something went wrong!",
+          });
+        });
+
+      if (!post) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found!" });
+      }
+
+      return post.comments;
+    }),
 });

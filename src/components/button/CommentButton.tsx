@@ -16,21 +16,49 @@ import { Input } from "@/components/ui/input";
 import { SendHorizontal, X } from "lucide-react";
 import { FaRegComment } from "react-icons/fa";
 
+import { api } from "@/trpc/react";
+import { useState } from "react";
+import { ClipLoader } from "react-spinners";
 import CommentCard from "../card/CommentCard";
 
 type Props = {
   className?: string;
-  commentCount: bigint;
+  initialCommentCount: bigint;
   username: string;
   postId: string;
 };
 
 export default function CommentButton({
   className,
-  commentCount,
+  initialCommentCount,
   username,
   postId,
 }: Props) {
+  const { data: commentCount, refetch: refetchCommentCount } =
+    api.post.getCommentCount.useQuery(
+      { postId },
+      { initialData: initialCommentCount },
+    );
+
+  const {
+    data: comments,
+    isLoading,
+    isError,
+    isSuccess,
+    error,
+    refetch: refetchComments,
+  } = api.comment.getAllInfiniteCommentsByPostId.useQuery({ postId });
+
+  const createComment = api.comment.create.useMutation({
+    onSuccess: async () => {
+      setCommentInput("");
+      await refetchComments();
+      await refetchCommentCount();
+    },
+  });
+
+  const [commentInput, setCommentInput] = useState("");
+
   return (
     <Drawer>
       <DrawerTrigger className="flex flex-col items-center gap-[0.15rem]">
@@ -47,18 +75,46 @@ export default function CommentButton({
         </DrawerHeader>
         <div className="w-full overflow-y-auto p-8">
           <div className="flex h-full w-full flex-col gap-y-8">
-            {Array.from({ length: 100 }).map((_, index) => (
-              <CommentCard key={index} />
-            ))}
+            {isLoading ? (
+              <ClipLoader size={32} color="white" className="mt-8" />
+            ) : isSuccess ? (
+              comments.map((comment, index) =>
+                comment ? (
+                  <CommentCard
+                    key={index}
+                    comment={comment.content}
+                    commentedBy={comment.commentedBy.name}
+                    commentedById={comment.commetedById}
+                  />
+                ) : null,
+              )
+            ) : (
+              <p className="text-2xl text-white">Nothing to see</p>
+            )}
           </div>
         </div>
         <DrawerFooter className="flex flex-row">
           <Input
             className="h-16 w-full border-gray-600 text-4xl"
             placeholder="Enter your comment on this post..."
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
           />
-          <Button className="h-16 w-16 bg-blue-600">
-            <SendHorizontal size={48} color="white" />
+          <Button
+            className="flex h-16 w-16 items-center justify-center bg-blue-600"
+            onClick={async () => {
+              await createComment.mutateAsync({
+                postId,
+                content: commentInput.valueOf(),
+              });
+            }}
+            disabled={createComment.isPending}
+          >
+            {createComment.isPending ? (
+              <ClipLoader size={24} color="white" className="mt-8" />
+            ) : (
+              <SendHorizontal size={48} color="white" />
+            )}
           </Button>
           <DrawerClose asChild className="absolute right-4 top-4">
             <button>
