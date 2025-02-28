@@ -22,6 +22,8 @@ import { ClipLoader } from "react-spinners";
 import ImageCropDrawer from "./ImageCropDrawer";
 
 export default function CreatePostForm(props: { username: string }) {
+  const utils = api.useUtils();
+
   const { username } = props;
 
   const {
@@ -45,7 +47,13 @@ export default function CreatePostForm(props: { username: string }) {
   const [caption, setCaption] = useState("");
   const [postType, setPostType] = useState("ALL");
 
-  const createPost = api.post.create.useMutation();
+  const createPost = api.post.create.useMutation({
+    onSuccess: async () => {
+      await utils.user.getMyAllTypeInfinitePosts.invalidate();
+      await utils.user.getMyMeTypeInfinitePosts.invalidate();
+      await utils.user.getMyFollowerTypeInfinitePosts.invalidate();
+    },
+  });
 
   async function onSubmit() {
     setFormError(undefined);

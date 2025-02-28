@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -9,7 +11,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { api } from "@/trpc/react";
 
 import { FiSend } from "react-icons/fi";
 
@@ -19,6 +21,12 @@ type Props = {
 };
 
 export default function ShareButton({ className, shareCount }: Props) {
+  const { data: users } =
+    api.user.getInfiniteFollowersAndFollowingUsers.useQuery(undefined, {
+      enabled: Boolean(shareCount),
+    });
+  console.log(users);
+
   return (
     <Drawer>
       <DrawerTrigger className="flex flex-col items-center gap-[0.15rem]">
@@ -32,7 +40,7 @@ export default function ShareButton({ className, shareCount }: Props) {
             This post will be shared to the selected profiles.
           </DrawerDescription>
         </DrawerHeader>
-        <ScrollArea className="w-full p-2">
+        <div className="w-full overflow-y-scroll p-2">
           <div className="h-8 border-[1px]"></div>
           <div className="h-8 border-[1px]"></div>
           <div className="h-8 border-[1px]"></div>
@@ -41,7 +49,7 @@ export default function ShareButton({ className, shareCount }: Props) {
           <div className="h-8 border-[1px]"></div>
           <div className="h-8 border-[1px]"></div>
           <div className="h-8 border-[1px]"></div>
-        </ScrollArea>
+        </div>
         <DrawerFooter className="flex flex-row">
           <Button>Share</Button>
           <DrawerClose asChild>

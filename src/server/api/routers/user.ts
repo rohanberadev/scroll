@@ -443,4 +443,46 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
+
+  getInfiniteFollowersAndFollowingUsers: protectedProcedure.query(
+    async function ({ ctx }) {
+      try {
+        return ctx.db.user.findFirst({
+          where: {
+            id: ctx.session.user.id,
+          },
+          select: {
+            Following: {
+              select: {
+                followerId: true,
+                followingUser: {
+                  select: {
+                    id: true,
+                    name: true,
+                    image: { select: { publicUrl: true } },
+                  },
+                },
+              },
+              where: { followerId: ctx.session.user.id },
+            },
+          },
+        });
+      } catch (error) {
+        console.error(
+          "Error in getInfiniteFollowersAndFollowingUsers while fecthing from db:",
+          error,
+        );
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
+    },
+  ),
 });

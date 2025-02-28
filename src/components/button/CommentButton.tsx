@@ -37,7 +37,12 @@ export default function CommentButton({
   const { data: commentCount, refetch: refetchCommentCount } =
     api.post.getCommentCount.useQuery(
       { postId },
-      { initialData: initialCommentCount },
+      {
+        initialData: initialCommentCount,
+        placeholderData: initialCommentCount,
+        enabled: Boolean(postId),
+        staleTime: 5000,
+      },
     );
 
   const {
@@ -47,7 +52,10 @@ export default function CommentButton({
     isSuccess,
     error,
     refetch: refetchComments,
-  } = api.comment.getAllInfiniteCommentsByPostId.useQuery({ postId });
+  } = api.comment.getAllInfiniteCommentsByPostId.useQuery(
+    { postId },
+    { enabled: Boolean(postId) },
+  );
 
   const createComment = api.comment.create.useMutation({
     onSuccess: async () => {
@@ -85,6 +93,9 @@ export default function CommentButton({
                     comment={comment.content}
                     commentedBy={comment.commentedBy.name}
                     commentedById={comment.commetedById}
+                    commentId={comment.id}
+                    isLikedByUser={comment.isLikedByUser}
+                    initialLikeCount={comment.likes}
                   />
                 ) : null,
               )
