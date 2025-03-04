@@ -59,7 +59,7 @@ export default function ShowPost(props: {
             />
             <CommentButton
               className="h-5 w-5"
-              commentCount={post.comments}
+              initialCommentCount={post.comments}
               username={post.postedBy.name}
               postId={post.id}
             />

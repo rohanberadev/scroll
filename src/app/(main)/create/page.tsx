@@ -13,7 +13,6 @@ export default async function Create() {
       <div className="w-full border-gray-800 max-lg:border-b-[1px] max-lg:p-4 lg:mb-4">
         <CreatePostForm username={session.user.name} />
       </div>
-      {/* <CreatePostTabs /> */}
     </div>
   );
 }

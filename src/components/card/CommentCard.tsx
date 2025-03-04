@@ -1,12 +1,12 @@
 "use client";
 
-import { EllipsisVertical } from "lucide-react";
-
 import Avatar from "@/components/user/Avatar";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import Link from "next/link";
 import { useState } from "react";
 import { GoHeart, GoHeartFill } from "react-icons/go";
+import CommentInfoButton from "../button/CommentInfoButton";
 
 export default function CommentCard(props: {
   comment: string;
@@ -14,6 +14,7 @@ export default function CommentCard(props: {
   commentedById: string;
   commentId: string;
   isLikedByUser: boolean;
+  isCommentedByUser: boolean;
   initialLikeCount: bigint;
 }) {
   const toggleLike = api.comment.toggleLike.useMutation({
@@ -26,7 +27,12 @@ export default function CommentCard(props: {
   const [likeCount, setLikeCount] = useState(props.initialLikeCount);
 
   return (
-    <div className="flex max-h-[80px] min-h-[80px] w-full items-center justify-between rounded-lg border-[1px] border-gray-600 px-6">
+    <div
+      className={cn(
+        "flex max-h-[80px] min-h-[80px] w-full items-center justify-between rounded-lg border-[1px] border-gray-600 px-6",
+        props.isCommentedByUser ? "bg-zinc-900" : "",
+      )}
+    >
       <div className="flex items-center gap-x-4">
         <Avatar />
         <div className="flex flex-col">
@@ -55,9 +61,7 @@ export default function CommentCard(props: {
 
           <span className="text-xs">{likeCount}</span>
         </button>
-        <button>
-          <EllipsisVertical size={24} />
-        </button>
+        <CommentInfoButton username={props.commentedBy} />
       </div>
     </div>
   );

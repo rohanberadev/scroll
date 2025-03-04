@@ -51,3 +51,9 @@ export const createPostFormSchema = z.object({
     .default([]),
   postType: z.enum(["ALL", "FOLLOWER", "ME"]),
 });
+
+export const editProfileFormSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  followPermission: z.boolean(),
+});

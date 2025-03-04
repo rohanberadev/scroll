@@ -7,11 +7,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/server/auth";
-
 import { LogOutIcon, SettingsIcon, UserRoundPenIcon } from "lucide-react";
+import Link from "next/link";
+import { BsBookmark } from "react-icons/bs";
 
 export default function ProfileInfoButton(props: {
   triggerClassName?: string;
+  username: string;
 }) {
   return (
     <DropdownMenu>
@@ -22,9 +24,24 @@ export default function ProfileInfoButton(props: {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-sm">
-          <UserRoundPenIcon />
-          <span>Edit Profile</span>
+          <Link
+            href={`/profile/${props.username}/edit`}
+            className="flex items-center gap-x-2"
+          >
+            <UserRoundPenIcon className="text-xs" />
+            <span>Edit Profile</span>
+          </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem className="text-sm">
+          <Link
+            href={`/profile/${props.username}/saved-posts`}
+            className="flex items-center gap-x-2"
+          >
+            <BsBookmark />
+            <span>Saved Posts</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem className="text-sm text-red-600">
           <LogOutIcon />
           <form

@@ -96,6 +96,7 @@ export default function CommentButton({
                     commentId={comment.id}
                     isLikedByUser={comment.isLikedByUser}
                     initialLikeCount={comment.likes}
+                    isCommentedByUser={comment.isCommentedByUser}
                   />
                 ) : null,
               )

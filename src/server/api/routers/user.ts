@@ -485,4 +485,67 @@ export const userRouter = createTRPCRouter({
       }
     },
   ),
+
+  toggleFollowPermission: protectedProcedure.mutation(async function ({ ctx }) {
+    try {
+      return await ctx.db.$transaction(async (trx) => {
+        const data = await trx.user.findFirst({
+          where: { id: ctx.session.user.id },
+          select: { followPermission: true },
+        });
+
+        if (data === null) {
+          throw new Error("Failed to toggle follow permission");
+        }
+
+        await trx.user.update({
+          where: { id: ctx.session.user.id },
+          data: { followPermission: !data.followPermission },
+        });
+
+        return !data.followPermission;
+      });
+    } catch (error) {
+      console.error(
+        "Error in toggleFollowPermission while storing in db:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
+
+  getMe: protectedProcedure.query(async function ({ ctx }) {
+    try {
+      return ctx.db.user.findFirst({
+        where: { id: ctx.session.user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          followPermission: true,
+        },
+      });
+    } catch (error) {
+      console.error("Error in getMe while fetching from db:", error);
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
 });

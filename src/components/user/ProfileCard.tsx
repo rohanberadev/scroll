@@ -81,7 +81,10 @@ export default function ProfileCard(props: {
       </div>
 
       {isProfileOwner && (
-        <ProfileInfoButton triggerClassName="absolute top-3 right-4 md:top-4 md:right-4" />
+        <ProfileInfoButton
+          username={username}
+          triggerClassName="absolute top-3 right-4 md:top-4 md:right-4"
+        />
       )}
     </div>
   );

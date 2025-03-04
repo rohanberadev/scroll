@@ -139,14 +139,22 @@ export const commentRouter = createTRPCRouter({
             },
             orderBy: { commentedAt: "desc" },
           })
-        ).map(({ CommenLike, ...comment }) =>
-          comment
-            ? {
-                ...comment,
-                isLikedByUser: CommenLike.length > 0,
-              }
-            : null,
-        );
+        )
+          .map(({ CommenLike, ...comment }) =>
+            comment
+              ? {
+                  ...comment,
+                  isLikedByUser: CommenLike.length > 0,
+                  isCommentedByUser:
+                    comment.commetedById === ctx.session.user.id,
+                }
+              : null,
+          )
+          .sort((a, b) => {
+            const A = a?.isCommentedByUser ? -1 : 1;
+            const B = b?.isCommentedByUser ? -1 : 1;
+            return A - B;
+          });
       } catch (error) {
         console.error(
           "Error in getAllInfiniteCommentsByPostId while fetching comments from db:",
@@ -282,5 +290,49 @@ export const commentRouter = createTRPCRouter({
       }
 
       return comment.likes;
+    }),
+
+  deleteCommentById: protectedProcedure
+    .input(z.object({ commentId: z.string().cuid() }))
+    .mutation(async function ({ ctx, input }) {
+      const storedComment = await ctx.db.comment.findFirst({
+        where: { id: input.commentId, commetedById: ctx.session.user.id },
+        select: { postId: true, id: true },
+      });
+
+      if (!storedComment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Comment not found",
+        });
+      }
+
+      try {
+        await ctx.db.$transaction([
+          ctx.db.post.update({
+            where: { id: storedComment.postId },
+            data: { comments: { decrement: 1 } },
+          }),
+
+          ctx.db.comment.delete({ where: { id: storedComment.id } }),
+        ]);
+      } catch (error) {
+        console.error(
+          "Error in deleteCommentById of comment while deleting comment from db:",
+          error,
+        );
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      }
+
+      return { success: "Comment is deleted", commentId: storedComment.id };
     }),
 });
