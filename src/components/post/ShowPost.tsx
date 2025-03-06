@@ -65,7 +65,7 @@ export default function ShowPost(props: {
             />
             <ShareButton className="h-5 w-5" shareCount={post.shares} />
           </div>
-          <SaveButton />
+          <SaveButton isSavedByUser={post.isSavedByUser} postId={post.id} />
         </div>
 
         <div className="flex w-full justify-start">

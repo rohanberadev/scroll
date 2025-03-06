@@ -89,8 +89,6 @@ export const postRouter = createTRPCRouter({
     }),
 
   infiniteLatestPosts: protectedProcedure.query(async function ({ ctx }) {
-    const { session } = ctx;
-
     return (
       await ctx.db.post.findMany({
         where: {
@@ -103,12 +101,12 @@ export const postRouter = createTRPCRouter({
                 {
                   type: "FOLLOWER",
                   postedBy: {
-                    Following: { some: { followerId: session.user.id } },
+                    Following: { some: { followerId: ctx.session.user.id } },
                   },
                 },
               ],
             },
-            { NOT: { postedById: session.user.id } },
+            { NOT: { postedById: ctx.session.user.id } },
           ],
         },
         include: {
@@ -118,26 +116,31 @@ export const postRouter = createTRPCRouter({
               name: true,
               Following: {
                 select: { followerId: true },
-                where: { followerId: session.user.id },
+                where: { followerId: ctx.session.user.id },
               },
             },
           },
           Like: {
             select: { likedById: true },
-            where: { likedById: session.user.id },
+            where: { likedById: ctx.session.user.id },
+          },
+          SavedPost: {
+            select: { savedById: true },
+            where: { savedById: ctx.session.user.id },
           },
         },
         orderBy: { postedAt: "desc" },
         take: 10,
       })
-    ).map((post) => ({
+    ).map(({ SavedPost, Like, ...post }) => ({
       ...post,
       postedBy: {
         name: post.postedBy.name,
         isFollowedByUser: post.postedBy.Following.length > 0,
       },
       isPostOwner: post.postedById === ctx.session.user.id,
-      isLikedByUser: post.Like.length > 0,
+      isLikedByUser: Like.length > 0,
+      isSavedByUser: SavedPost.length > 0,
     }));
   }),
 
@@ -498,5 +501,40 @@ export const postRouter = createTRPCRouter({
       }
 
       return post.comments;
+    }),
+
+  toggleSavePost: protectedProcedure
+    .input(z.object({ postId: z.string().cuid() }))
+    .mutation(async function ({ ctx, input }) {
+      const storedPost = await ctx.db.post.findFirst({
+        where: { id: input.postId },
+        select: { id: true },
+      });
+
+      if (!storedPost) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" });
+      }
+
+      const existingSave = await ctx.db.savedPost.findUnique({
+        where: {
+          savedById_postId: {
+            savedById: ctx.session.user.id,
+            postId: input.postId,
+          },
+        },
+        select: { id: true },
+      });
+
+      if (existingSave) {
+        // Unsave the post
+        await ctx.db.savedPost.delete({ where: { id: existingSave.id } });
+        return false;
+      } else {
+        // Save the post
+        await ctx.db.savedPost.create({
+          data: { savedById: ctx.session.user.id, postId: storedPost.id },
+        });
+        return true;
+      }
     }),
 });

@@ -61,7 +61,10 @@ export default function CommentCard(props: {
 
           <span className="text-xs">{likeCount}</span>
         </button>
-        <CommentInfoButton username={props.commentedBy} />
+        <CommentInfoButton
+          commentedBy={props.commentedBy}
+          isCommentedByUser={props.isCommentedByUser}
+        />
       </div>
     </div>
   );

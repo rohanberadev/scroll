@@ -203,6 +203,8 @@ model SavedPost {
 
     post    Post @relation(fields: [postId], references: [id], onDelete: Cascade)
     savedBy User @relation(fields: [savedById], references: [id], onDelete: Cascade)
+
+    @@unique([savedById, postId])
 }
 
 model Follow {
