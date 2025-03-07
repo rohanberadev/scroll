@@ -62,6 +62,7 @@ export default function ShowPost(props: {
               initialCommentCount={post.comments}
               username={post.postedBy.name}
               postId={post.id}
+              postType={post.type}
             />
             <ShareButton className="h-5 w-5" shareCount={post.shares} />
           </div>

@@ -552,7 +552,21 @@ export const userRouter = createTRPCRouter({
   getMyInfiniteSavedPosts: protectedProcedure.query(async function ({ ctx }) {
     try {
       return ctx.db.savedPost.findMany({
-        where: { savedById: ctx.session.user.id },
+        where: {
+          savedById: ctx.session.user.id,
+          OR: [
+            { post: { type: "ALL" } },
+            {
+              post: {
+                type: "FOLLOWER",
+                postedBy: {
+                  Following: { some: { followerId: ctx.session.user.id } },
+                },
+              },
+            },
+            { post: { type: "ME", postedById: ctx.session.user.id } },
+          ],
+        },
         include: {
           post: {
             select: {

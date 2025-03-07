@@ -270,7 +270,21 @@ export const postRouter = createTRPCRouter({
       const { postId } = input;
 
       const storedPost = await ctx.db.post
-        .findFirst({ where: { id: postId } })
+        .findFirst({
+          where: {
+            id: postId,
+            OR: [
+              { type: "ALL" },
+              {
+                type: "FOLLOWER",
+                postedBy: {
+                  Following: { some: { followerId: ctx.session.user.id } },
+                },
+              },
+              { type: "ME", postedById: ctx.session.user.id },
+            ],
+          },
+        })
         .catch((error) => {
           console.error(
             "Error in toggleLike post while fetching post from db:",
@@ -552,6 +566,63 @@ export const postRouter = createTRPCRouter({
           data: { savedById: ctx.session.user.id, postId: storedPost.id },
         });
         return true;
+      }
+    }),
+
+  changePostVisibility: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().cuid(),
+        newPostType: z.enum(["FOLLOWER", "ALL", "ME"]),
+      }),
+    )
+    .mutation(async function ({ ctx, input }) {
+      const storedPost = await ctx.db.post.findFirst({
+        where: { id: input.postId, postedById: ctx.session.user.id },
+        select: { id: true, type: true },
+      });
+
+      if (!storedPost) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Post not found" });
+      }
+
+      try {
+        if (
+          (storedPost.type === "ALL" || storedPost.type === "FOLLOWER") &&
+          input.newPostType === "ME"
+        ) {
+          await ctx.db.$transaction([
+            ctx.db.post.update({
+              where: { id: storedPost.id },
+              data: { type: input.newPostType },
+            }),
+            ctx.db.file.updateMany({
+              where: { postId: storedPost.id },
+              data: { publicUrl: null },
+            }),
+          ]);
+        } else {
+          await ctx.db.post.update({
+            where: { id: storedPost.id },
+            data: { type: input.newPostType },
+          });
+        }
+      } catch (error) {
+        console.error(
+          "Error in changePostVisibility while storing in db:",
+          error,
+        );
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
       }
     }),
 });

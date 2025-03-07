@@ -26,6 +26,7 @@ type Props = {
   initialCommentCount: bigint;
   username: string;
   postId: string;
+  postType: string;
 };
 
 export default function CommentButton({
@@ -33,6 +34,7 @@ export default function CommentButton({
   initialCommentCount,
   username,
   postId,
+  postType,
 }: Props) {
   const { data: commentCount, refetch: refetchCommentCount } =
     api.post.getCommentCount.useQuery(
@@ -54,7 +56,7 @@ export default function CommentButton({
     refetch: refetchComments,
   } = api.comment.getAllInfiniteCommentsByPostId.useQuery(
     { postId },
-    { enabled: Boolean(postId) },
+    { enabled: Boolean(postId && postType !== "ME") },
   );
 
   const createComment = api.comment.create.useMutation({
@@ -101,7 +103,11 @@ export default function CommentButton({
                 ) : null,
               )
             ) : (
-              <p className="text-2xl text-white">Nothing to see</p>
+              <div className="flex h-full w-full items-center justify-center bg-gray-950 p-4">
+                <p className="text-2xl text-gray-600">
+                  No comments in this post.
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -120,13 +126,9 @@ export default function CommentButton({
                 content: commentInput.valueOf(),
               });
             }}
-            disabled={createComment.isPending}
+            disabled={createComment.isPending || postType === "ME"}
           >
-            {createComment.isPending ? (
-              <ClipLoader size={24} color="white" className="mt-8" />
-            ) : (
-              <SendHorizontal size={48} color="white" />
-            )}
+            <SendHorizontal size={48} color="white" />
           </Button>
           <DrawerClose asChild className="absolute right-4 top-4">
             <button>

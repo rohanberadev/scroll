@@ -177,7 +177,21 @@ export const commentRouter = createTRPCRouter({
     .input(z.object({ commentId: z.string().cuid() }))
     .mutation(async function ({ ctx, input }) {
       const storedComment = await ctx.db.comment.findFirst({
-        where: { id: input.commentId },
+        where: {
+          id: input.commentId,
+          OR: [
+            { post: { type: "ALL" } },
+            {
+              post: {
+                type: "FOLLOWER",
+                postedBy: {
+                  Following: { some: { followerId: ctx.session.user.id } },
+                },
+              },
+            },
+            { NOT: { post: { type: "ME" } } },
+          ],
+        },
         select: { id: true },
       });
 

@@ -9,8 +9,13 @@ export default function SaveButton(props: {
   isSavedByUser: boolean;
   postId: string;
 }) {
+  const utils = api.useUtils();
   const [state, setState] = useState(props.isSavedByUser);
-  const savePost = api.post.toggleSavePost.useMutation();
+  const savePost = api.post.toggleSavePost.useMutation({
+    onSuccess: async function () {
+      await utils.user.getMyInfiniteSavedPosts.refetch();
+    },
+  });
 
   async function onClick() {
     setState(!state);
