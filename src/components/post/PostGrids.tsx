@@ -196,3 +196,43 @@ export function MyUserMeTypePostsGrid() {
     );
   }
 }
+
+export function SavedPostGrid() {
+  const {
+    data: savedPosts,
+    isLoading,
+    isError,
+    isSuccess,
+    error,
+  } = api.user.getMyInfiniteSavedPosts.useQuery();
+
+  if (isLoading) {
+    return <ClipLoader size={32} color="white" className="mt-8" />;
+  }
+
+  if (error) {
+    console.error(error);
+    return <p className="text-2xl text-red-600">{JSON.stringify(error)}</p>;
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="grid w-full grid-cols-3">
+        {savedPosts.map(
+          (savedPost, index) =>
+            savedPost.post && (
+              <Link href={`/posts/${savedPost.post.id}`} key={index}>
+                {savedPost.post.files[0] && (
+                  <PostGridBox
+                    likes={savedPost.post.likes}
+                    comments={savedPost.post.comments}
+                    file={savedPost.post.files[0]}
+                  />
+                )}
+              </Link>
+            ),
+        )}
+      </div>
+    );
+  }
+}

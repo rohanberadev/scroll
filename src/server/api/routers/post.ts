@@ -187,6 +187,10 @@ export const postRouter = createTRPCRouter({
                 select: { likedById: true },
                 where: { likedById: ctx.session.user.id },
               },
+              SavedPost: {
+                select: { savedById: true },
+                where: { savedById: ctx.session.user.id },
+              },
             },
           })
           .catch((error) => {
@@ -209,6 +213,7 @@ export const postRouter = createTRPCRouter({
               },
               isLikedByUser: post.Like.length > 0,
               isPostOwner: post.postedById === ctx.session.user.id,
+              isSavedByUser: post.SavedPost.length > 0,
             }
           : null,
       );
@@ -507,7 +512,19 @@ export const postRouter = createTRPCRouter({
     .input(z.object({ postId: z.string().cuid() }))
     .mutation(async function ({ ctx, input }) {
       const storedPost = await ctx.db.post.findFirst({
-        where: { id: input.postId },
+        where: {
+          id: input.postId,
+          OR: [
+            { type: "ALL" },
+            {
+              type: "FOLLOWER",
+              postedBy: {
+                Following: { some: { followerId: ctx.session.user.id } },
+              },
+            },
+            { type: "ME", postedById: ctx.session.user.id },
+          ],
+        },
         select: { id: true },
       });
 

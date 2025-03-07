@@ -1,3 +1,4 @@
+import { SavedPostGrid } from "@/components/post/PostGrids";
 import { auth } from "@/server/auth";
 import { api } from "@/trpc/server";
 import { redirect } from "next/navigation";
@@ -17,10 +18,14 @@ export default async function SavedPostsPage({
   if (!user) redirect("/not-found");
 
   return (
-    <div className="flex h-full w-full flex-col lg:w-[700px] lg:p-4">
-      <h1 className="pt-8 text-3xl text-gray-200">Saved Posts</h1>
-      <div className="w-full border-gray-800 max-lg:border-b-[1px] max-lg:p-4 lg:mb-4">
-        {/* <EditProfileForm user={user} /> */}
+    <div className="h-full w-full lg:flex lg:items-center lg:justify-center lg:px-4 lg:pt-12">
+      <div className="h-full w-full lg:flex lg:min-w-[650px] lg:max-w-[850px] lg:flex-col lg:items-center lg:justify-between lg:gap-y-2">
+        <h1 className="mb-8 w-full text-left text-2xl text-gray-200">
+          Saved Posts
+        </h1>
+        <div className="flex min-h-[calc(100vh-150px)] w-full justify-center rounded-sm border-[1px] border-gray-800 max-lg:h-screen">
+          <SavedPostGrid />
+        </div>
       </div>
     </div>
   );

@@ -548,4 +548,37 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
+
+  getMyInfiniteSavedPosts: protectedProcedure.query(async function ({ ctx }) {
+    try {
+      return ctx.db.savedPost.findMany({
+        where: { savedById: ctx.session.user.id },
+        include: {
+          post: {
+            select: {
+              id: true,
+              likes: true,
+              comments: true,
+              files: { take: 1, orderBy: { createdAt: "asc" } },
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Error in getMyInfiniteSavedPosts while fetching from db:",
+        error,
+      );
+      if (error instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error.message,
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong!",
+      });
+    }
+  }),
 });
