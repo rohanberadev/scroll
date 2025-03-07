@@ -18,25 +18,17 @@ export default function SaveButton(props: {
     setState(newState);
   }
 
-  if (state) {
-    return (
-      <Button
-        className="bg-transparent"
-        disabled={savePost.isPending}
-        onClick={onClick}
-      >
-        <BsBookmarkFill className="h-5 w-5 cursor-pointer" />
-      </Button>
-    );
-  }
-
   return (
     <Button
       className="bg-transparent"
       disabled={savePost.isPending}
       onClick={onClick}
     >
-      <BsBookmark className="h-5 w-5 cursor-pointer" />
+      {state ? (
+        <BsBookmarkFill className="h-5 w-5 cursor-pointer" />
+      ) : (
+        <BsBookmark className="h-5 w-5 cursor-pointer" />
+      )}
     </Button>
   );
 }
