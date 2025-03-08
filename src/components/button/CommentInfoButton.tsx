@@ -24,21 +24,20 @@ export default function CommentInfoButton(props: {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link href={`/profile/${props.commentedBy}`} className="w-full">
+          <Link
+            href={`/profile/${props.commentedBy}`}
+            className="w-full text-center"
+          >
             Profile
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          {props.isCommentedByUser ? (
+        {props.isCommentedByUser ? (
+          <DropdownMenuItem>
             <button className="w-full bg-transparent text-red-600">
               Delete this comment
             </button>
-          ) : (
-            <button className="w-full bg-transparent text-red-600">
-              Delete this comment
-            </button>
-          )}
-        </DropdownMenuItem>
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

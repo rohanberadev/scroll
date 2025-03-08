@@ -88,27 +88,29 @@ export default function CommentButton({
             {isLoading ? (
               <ClipLoader size={32} color="white" className="mt-8" />
             ) : isSuccess ? (
-              comments.map((comment, index) =>
-                comment ? (
-                  <CommentCard
-                    key={index}
-                    comment={comment.content}
-                    commentedBy={comment.commentedBy.name}
-                    commentedById={comment.commetedById}
-                    commentId={comment.id}
-                    isLikedByUser={comment.isLikedByUser}
-                    initialLikeCount={comment.likes}
-                    isCommentedByUser={comment.isCommentedByUser}
-                  />
-                ) : null,
+              comments.length === 0 ? (
+                <div className="flex h-full w-full items-center justify-center bg-gray-950 p-4">
+                  <p className="text-2xl text-gray-600">
+                    No comments in this post.
+                  </p>
+                </div>
+              ) : (
+                comments.map((comment, index) =>
+                  comment ? (
+                    <CommentCard
+                      key={index}
+                      comment={comment.content}
+                      commentedBy={comment.commentedBy.name}
+                      commentedById={comment.commetedById}
+                      commentId={comment.id}
+                      isLikedByUser={comment.isLikedByUser}
+                      initialLikeCount={comment.likes}
+                      isCommentedByUser={comment.isCommentedByUser}
+                    />
+                  ) : null,
+                )
               )
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gray-950 p-4">
-                <p className="text-2xl text-gray-600">
-                  No comments in this post.
-                </p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
         <DrawerFooter className="flex flex-row">

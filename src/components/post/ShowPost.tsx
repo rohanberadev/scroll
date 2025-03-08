@@ -42,7 +42,11 @@ export default function ShowPost(props: {
             )}
           </CardTitle>
         </div>
-        <PostInfoButton />
+        <PostInfoButton
+          username={post.postedBy.name}
+          postedAt={post.postedAt}
+          isPostOwner={post.isPostOwner}
+        />
       </CardHeader>
       <CardContent className="w-full p-0">
         {post.files && <PostMedia files={post.files} postType={post.type} />}
