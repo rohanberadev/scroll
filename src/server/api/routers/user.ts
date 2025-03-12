@@ -454,8 +454,7 @@ export const userRouter = createTRPCRouter({
           select: {
             Following: {
               select: {
-                followerId: true,
-                followingUser: {
+                followerUser: {
                   select: {
                     id: true,
                     name: true,
@@ -463,7 +462,17 @@ export const userRouter = createTRPCRouter({
                   },
                 },
               },
-              where: { followerId: ctx.session.user.id },
+            },
+            Follower: {
+              select: {
+                followerUser: {
+                  select: {
+                    id: true,
+                    name: true,
+                    image: { select: { publicUrl: true } },
+                  },
+                },
+              },
             },
           },
         });
@@ -595,4 +604,172 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
+
+  getInfiniteFollowersOfUser: protectedProcedure
+    .input(z.object({ username: z.string() }))
+    .query(async function ({ ctx, input }) {
+      const storedUser = await ctx.db.user.findFirst({
+        where: { name: input.username },
+        select: { id: true },
+      });
+
+      if (!storedUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      const [sessionUser, otherUsers] = await Promise.all([
+        ctx.db.follow.findUnique({
+          where: {
+            followerId_followingId: {
+              followerId: ctx.session.user.id,
+              followingId: storedUser.id,
+            },
+          },
+          select: {
+            followerUser: {
+              select: {
+                id: true,
+                name: true,
+                image: { select: { publicUrl: true } },
+                Following: {
+                  select: { followerId: true },
+                  where: { followerId: ctx.session.user.id },
+                },
+                followers: true,
+              },
+            },
+          },
+        }),
+
+        ctx.db.follow.findMany({
+          where: {
+            followingId: storedUser.id,
+            NOT: [{ followerId: ctx.session.user.id }],
+          },
+          select: {
+            followerUser: {
+              select: {
+                id: true,
+                name: true,
+                image: { select: { publicUrl: true } },
+                Following: {
+                  select: { followerId: true },
+                  where: { followerId: ctx.session.user.id },
+                },
+                followers: true,
+              },
+            },
+          },
+        }),
+      ]).catch((error) => {
+        console.error(
+          "Error in getInfiniteFollowingOfUser while fetching from db:",
+          error,
+        );
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      });
+
+      const followerUsers = [sessionUser, ...otherUsers].filter(
+        (user) => user !== null,
+      );
+
+      return followerUsers.map(({ followerUser }) => ({
+        ...followerUser,
+        isFollowedByUser: followerUser.Following.length > 0,
+        isProfileOwner: followerUser.id === ctx.session.user.id,
+      }));
+    }),
+
+  getInfiniteFollowingOfUser: protectedProcedure
+    .input(z.object({ username: z.string() }))
+    .query(async function ({ ctx, input }) {
+      const storedUser = await ctx.db.user.findFirst({
+        where: { name: input.username },
+        select: { id: true },
+      });
+
+      if (!storedUser) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      const [sessionUser, otherUsers] = await Promise.all([
+        ctx.db.follow.findUnique({
+          where: {
+            followerId_followingId: {
+              followerId: storedUser.id,
+              followingId: ctx.session.user.id,
+            },
+          },
+          select: {
+            followingUser: {
+              select: {
+                id: true,
+                name: true,
+                image: { select: { publicUrl: true } },
+                Following: {
+                  select: { followerId: true },
+                  where: { followerId: ctx.session.user.id },
+                },
+                followers: true,
+              },
+            },
+          },
+        }),
+
+        ctx.db.follow.findMany({
+          where: {
+            followerId: storedUser.id,
+            NOT: [{ followingId: ctx.session.user.id }],
+          },
+          select: {
+            followingUser: {
+              select: {
+                id: true,
+                name: true,
+                image: { select: { publicUrl: true } },
+                Following: {
+                  select: { followerId: true },
+                  where: { followerId: ctx.session.user.id },
+                },
+                followers: true,
+              },
+            },
+          },
+        }),
+      ]).catch((error) => {
+        console.error(
+          "Error in getInfiniteFollowingOfUser while fetching from db:",
+          error,
+        );
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong!",
+        });
+      });
+
+      const followingUsers = [sessionUser, ...otherUsers].filter(
+        (user) => user !== null,
+      );
+
+      return followingUsers.map(({ followingUser }) => ({
+        ...followingUser,
+        isFollowedByUser: followingUser.Following.length > 0,
+        isProfileOwner: followingUser.id === ctx.session.user.id,
+      }));
+    }),
 });

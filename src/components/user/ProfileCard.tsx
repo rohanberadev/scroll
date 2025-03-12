@@ -37,38 +37,23 @@ export default function ProfileCard(props: {
       >
         <div className="flex w-full items-center justify-between px-4 max-lg:gap-x-6 max-lg:pt-4 lg:gap-x-12 lg:px-6">
           <Link
-            href={
-              enableFollowBtn && userId
-                ? `/profile/${userId}/followers`
-                : "/profile/me/followers"
-            }
+            href={`/profile/${username}/followers`}
             className="flex flex-col items-center justify-center"
           >
             <h1 className="text-sm md:text-lg lg:text-xl">Followers</h1>
             <p className="text-sm md:text-lg lg:text-xl">{followers}</p>
           </Link>
           <Link
-            href={
-              enableFollowBtn && userId
-                ? `/profile/${userId}/following`
-                : "/profile/me/following"
-            }
+            href={`/profile/${username}/following`}
             className="flex flex-col items-center justify-center"
           >
             <h1 className="text-sm md:text-lg lg:text-xl">Following</h1>
             <p className="text-sm md:text-lg lg:text-xl">{following}</p>
           </Link>
-          <Link
-            href={
-              enableFollowBtn && userId
-                ? `/profile/${userId}/posts`
-                : "/profile/me/posts"
-            }
-            className="flex flex-col items-center justify-center"
-          >
+          <div className="flex flex-col items-center justify-center">
             <h1 className="text-sm md:text-lg lg:text-xl">Posts</h1>
             <p className="text-sm md:text-lg lg:text-xl">{posts}</p>
-          </Link>
+          </div>
         </div>
 
         <FollowButton

@@ -1,5 +1,6 @@
 import FollowButton from "@/components/button/FollowButton";
 import Avatar from "@/components/user/Avatar";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export default function UserCard(props: {
@@ -11,12 +12,18 @@ export default function UserCard(props: {
     id: string;
     name: string;
     followers: bigint;
+    isProfileOwner: boolean;
   };
 }) {
   const { user } = props;
 
   return (
-    <div className="flex h-[100px] w-full items-center justify-between border-b-[1px] border-gray-600 px-8">
+    <div
+      className={cn(
+        "flex h-[100px] w-full items-center justify-between border-b-[1px] border-gray-600 px-8",
+        user.isProfileOwner ? "bg-stone-900" : "",
+      )}
+    >
       <div className="flex items-center gap-x-8">
         <Avatar />
         <Link
@@ -27,7 +34,9 @@ export default function UserCard(props: {
         </Link>
       </div>
       <div>
-        {user.isFollowedByUser ? null : <FollowButton userId={user.id} />}
+        {user.isFollowedByUser || user.isProfileOwner ? null : (
+          <FollowButton userId={user.id} />
+        )}
       </div>
     </div>
   );

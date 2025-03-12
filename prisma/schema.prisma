@@ -43,6 +43,8 @@ model User {
     VerificationToken   VerificationToken[]
     image               File?               @relation(fields: [imageId], references: [id])
     CommenLike          CommenLike[]
+    SentMessages        Message[]           @relation("SentMessages")
+    RecievedMessages    Message[]           @relation("RecievedMessages")
 
     @@index([name])
 }
@@ -101,6 +103,20 @@ model Post {
     SavedPost SavedPost[]
 
     @@index([postedById])
+}
+
+model Message {
+    id               String    @id @default(cuid())
+    content          String?
+    sentByUserId     String
+    recievedByUserId String
+    readAt           DateTime?
+    deletedAt        DateTime?
+    sentAt           DateTime  @default(now())
+    updatedAt        DateTime
+
+    SentByUser     User @relation("SentMessages", fields: [sentByUserId], references: [id], onDelete: Cascade)
+    RecievedByUser User @relation("RecievedMessages", fields: [recievedByUserId], references: [id], onDelete: Cascade)
 }
 
 model File {
