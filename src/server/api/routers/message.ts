@@ -39,7 +39,16 @@ export const messageRouter = createTRPCRouter({
 
   recentMessagesOfUser: protectedProcedure
     .input(
-      z.object({ userId: z.string().cuid(), limit: z.number().default(10) }),
+      z.object({
+        userId: z.string().cuid(),
+        limit: z.number().min(1).max(100).nullish(),
+        cursor: z
+          .object({
+            id: z.string(),
+            sentAt: z.date(),
+          })
+          .nullish(),
+      }),
     )
     .query(async function ({ ctx, input }) {
       const storedUser = await ctx.db.user.findFirst({
@@ -54,7 +63,9 @@ export const messageRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
       }
 
-      return await ctx.db.message.findMany({
+      const limit = input.limit ?? 10;
+
+      const messages = await ctx.db.message.findMany({
         where: {
           OR: [
             {
@@ -67,9 +78,20 @@ export const messageRouter = createTRPCRouter({
             },
           ],
         },
-        take: input.limit,
-        orderBy: { sentAt: "desc" },
+        take: limit + 1,
+        cursor: input.cursor ? { id_sentAt: { ...input.cursor } } : undefined,
+        orderBy: [{ sentAt: "desc" }, { id: "desc" }],
       });
+
+      let nextCursor: typeof input.cursor | undefined;
+      if (messages.length > limit) {
+        const nextMessage = messages.pop();
+        if (nextMessage) {
+          nextCursor = { sentAt: nextMessage.sentAt, id: nextMessage.id };
+        }
+      }
+
+      return { messages, nextCursor };
     }),
 
   getUser: protectedProcedure

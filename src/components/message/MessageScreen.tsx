@@ -6,7 +6,7 @@ import { type RouterOutputs, api as apiClient } from "@/trpc/react";
 import { pusher } from "@/utils/pusher/client";
 import { getPublicRoomId } from "@/utils/pusher/roomId";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import InputMessageBox from "./InputMessageBox";
 
 export default function MessageScreen({
@@ -23,30 +23,38 @@ export default function MessageScreen({
     name: string;
   };
 }) {
-  type MessageType = RouterOutputs["message"]["recentMessagesOfUser"][0];
+  type MessageType =
+    RouterOutputs["message"]["recentMessagesOfUser"]["messages"];
 
   const [content, setContent] = useState("");
 
   const queryClient = useQueryClient();
-  const { data: messages } = useQuery({
+  const { data } = useQuery({
     queryKey: ["messages", chatUser.id],
-    queryFn: () => getRecentMessages(chatUser.id, 10),
+    queryFn: async () => {
+      const response = await getRecentMessages(chatUser.id, 10, nextCursor);
+      setNextCursor(response.nextCursor);
+      return response.messages;
+    },
     initialData: undefined,
     enabled: Boolean(chatUser.id),
   });
 
   const sendMessage = apiClient.message.create.useMutation();
   const roomId = getPublicRoomId(sessionUser.id, chatUser.id);
+  const [nextCursor, setNextCursor] =
+    useState<RouterOutputs["message"]["recentMessagesOfUser"]["nextCursor"]>();
 
   useEffect(() => {
     const channel = pusher.subscribe(roomId);
 
-    const handleNewMessage = (newMessage: MessageType) => {
+    const handleNewMessage = (newMessage: MessageType[0]) => {
+      console.log("message: ", newMessage);
       queryClient.setQueryData(
         ["messages", chatUser.id],
-        (oldMessages?: MessageType[]) => {
-          if (!oldMessages) return [newMessage];
-          return [...oldMessages, newMessage];
+        (oldData?: MessageType) => {
+          if (!oldData) return [newMessage];
+          return [newMessage, ...oldData];
         },
       );
     };
@@ -57,11 +65,20 @@ export default function MessageScreen({
       channel.unbind("message", handleNewMessage);
       pusher.unsubscribe(roomId);
     };
-  }, [queryClient, roomId, chatUser, messages]);
+  }, [queryClient, roomId, chatUser]);
+
+  useEffect(() => {
+    const messageEnd = document.getElementById("messageEnd");
+    if (messageEnd) {
+      messageEnd.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [data]);
+
+  const messages = useMemo(() => data?.slice().reverse(), [data]);
 
   return (
     <>
-      <div className="flex min-h-full flex-col gap-y-6 p-6">
+      <div className="flex min-h-full flex-col gap-y-6 p-6" id="chatScreen">
         {messages?.map((message) => (
           <div
             key={message.id}
@@ -83,6 +100,7 @@ export default function MessageScreen({
             </span>
           </div>
         ))}
+        <div id="messageEnd" />
       </div>
       <InputMessageBox
         onSubmit={async (content: string) => {
